@@ -1,0 +1,100 @@
+.skill-card {
+  background: #0f0f19;
+  border: 1px solid #2a2a3b;
+  border-radius: 12px;
+  padding: 1rem;
+  color: white;
+  box-shadow: 0 0 10px rgba(80, 60, 200, 0.2);
+  transition: all 0.3s ease;
+}
+
+.skill-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 15px rgba(130, 90, 255, 0.3);
+}
+
+.skill-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-type {
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+.skill-type.offer {
+  background: linear-gradient(90deg, #6c63ff, #836fff);
+}
+
+.skill-type.request {
+  background: linear-gradient(90deg, #4a9fff, #7b61ff);
+}
+
+.skill-desc {
+  margin: 0.5rem 0 1rem;
+  color: #ccc;
+}
+
+.skill-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.accept-btn {
+  background: linear-gradient(90deg, #6c63ff, #836fff);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.accept-btn:hover {
+  opacity: 0.85;
+}
+
+.accepted-by {
+  color: #8ef39c;
+}
+
+.posted-by {
+  color: #aaa;
+  font-size: 0.9rem;
+}
+
+.complete-btn {
+  background: linear-gradient(90deg, #3ee77e, #58ffb1);
+  border: none;
+  color: black;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: 600;
+}
+
+.complete-btn:hover {
+  opacity: 0.85;
+}
+
+.your-post {
+  color: #aaa;
+  font-style: italic;
+}
+
+.skill-type.accepted {
+  background: linear-gradient(90deg, #4c6ef5, #6a9eff);
+}
+.skill-type.completed {
+  background: linear-gradient(90deg, #32d17b, #6affb5);
+}
+.completed-text {
+  color: #9effa2;
+  font-weight: 600;
+}

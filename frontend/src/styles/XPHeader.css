@@ -1,0 +1,47 @@
+/* src/styles/XPHeader.css */
+.xp-header {
+  background-color: #0f111a;
+  border: 1px solid #181a25;
+  border-radius: 12px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.xp-left {
+  flex: 1;
+}
+
+.xp-title {
+  margin: 0;
+  font-size: 14px;
+  color: #9a9aa5;
+}
+
+.xp-bar {
+  background-color: #1a1a25;
+  border-radius: 10px;
+  height: 8px;
+  width: 100%;
+  margin: 6px 0;
+}
+
+.xp-progress {
+  background: linear-gradient(90deg, #6c5ce7, #3d9cff);
+  height: 100%;
+  border-radius: 10px;
+}
+
+.xp-count {
+  font-size: 12px;
+  color: #9a9aa5;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #3d9cff;
+}

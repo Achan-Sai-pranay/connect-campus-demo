@@ -1,0 +1,154 @@
+.pomodoro-page {
+  min-height: 100vh;
+  background: #0b0b18;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 4rem;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+}
+
+.pomodoro-card {
+  background: #141427;
+  border-radius: 24px;
+  padding: 2rem 3rem;
+  width: 420px;
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.25);
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #c084fc;
+  margin-bottom: 0.25rem;
+}
+
+.subtitle {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #c4b5fd;
+  margin-bottom: 1.5rem;
+}
+
+.topic-input {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 10px;
+  background: #1a1a2e;
+  color: #ddd;
+  text-align: center;
+  border: 1px solid #2d2b4e;
+  outline: none;
+  margin-bottom: 1.5rem;
+}
+
+.ring-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-ring {
+  transform: rotate(-90deg);
+}
+
+.ring-bg {
+  fill: none;
+  stroke: #1a1a2e;
+}
+
+.ring-progress {
+  fill: none;
+  stroke: #8b5cf6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.3s linear;
+  filter: drop-shadow(0 0 10px #8b5cf6);
+}
+
+.time-display {
+  position: absolute;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #c4b5fd;
+}
+
+.controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+.btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s;
+  color: white;
+}
+
+.start {
+  background: #7c3aed;
+}
+
+.start:hover {
+  background: #6d28d9;
+}
+
+.pause {
+  background: #f97316;
+}
+
+.pause:hover {
+  background: #ea580c;
+}
+
+.reset {
+  background: #334155;
+}
+
+.reset:hover {
+  background: #475569;
+}
+
+.session-info {
+  text-align: left;
+  margin-top: 1rem;
+}
+
+.session-info h3 {
+  color: #c084fc;
+  margin-bottom: 0.4rem;
+}
+
+.no-session {
+  color: #888;
+  font-size: 0.9rem;
+}
+
+.session-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.session-info li {
+  background: #1a1a2e;
+  border-radius: 10px;
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.3rem;
+  color: #ddd;
+  font-size: 0.85rem;
+}

@@ -1,0 +1,79 @@
+/* src/styles/SkillsHub.css */
+
+.skills-hub-container {
+  background-color: #0b0b12;
+  color: white;
+  min-height: 100vh;
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: "Inter", sans-serif;
+}
+
+/* Two-column layout */
+.skills-hub-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+/* Left side content */
+.skills-section {
+  background: #11111b;
+  padding: 1rem 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.skills-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.6rem;
+}
+
+/* Buttons */
+.post-btn,
+.request-btn {
+  background: linear-gradient(90deg, #6c63ff, #836fff);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.post-btn:hover,
+.request-btn:hover {
+  opacity: 0.85;
+}
+
+/* Skills list */
+.skills-list {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Empty state text */
+.empty-state {
+  text-align: center;
+  margin-top: 2rem;
+  color: #aaa;
+}
+
+/* Right side (Leaderboard) */
+.leaderboard-section {
+  background: #11111b;
+  border-radius: 1rem;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+  padding: 1rem;
+  height: fit-content;
+}

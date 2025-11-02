@@ -1,0 +1,18 @@
+.app-container {
+  background-color: #090a10;
+  min-height: 100vh;
+  color: white;
+  font-family: "Inter", sans-serif;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  background-color: #090a10;
+  color: white;
+  font-family: "Inter", sans-serif;
+  height: 100%;
+}

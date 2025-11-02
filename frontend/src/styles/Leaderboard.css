@@ -1,0 +1,84 @@
+.leaderboard {
+  background-color: #0e0f17;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  width: 340px;
+  color: white;
+  height: fit-content;
+  box-shadow: 0 0 12px rgba(118, 59, 225, 0.15);
+}
+
+.leaderboard h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.leaderboard-item {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.3s ease;
+}
+
+.leaderboard-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.rank-badge {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.user-info {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.username {
+  font-weight: 500;
+  margin: 0;
+}
+
+.level {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.xp {
+  text-align: right;
+  font-weight: 600;
+  color: #60a5fa;
+}
+
+.xp-text {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-left: 3px;
+}
+
+.leaderboard-item.you {
+  background: linear-gradient(90deg, rgba(98,0,255,0.35), rgba(0,122,255,0.35));
+  border: 1px solid rgba(118, 59, 225, 0.4);
+  box-shadow: 0 0 12px rgba(118, 59, 225, 0.3);
+}
