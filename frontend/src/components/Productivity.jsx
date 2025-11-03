@@ -1,190 +1,238 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
+import PomodoroTimer from "./PomodoroTimer";
+import ProductivityAnalytics from "./ProductivityAnalytics";
 import "../styles/Productivity.css";
 
-const Productivity = () => {
-  const [timeLeft, setTimeLeft] = useState(25 * 60);
-  const [isRunning, setIsRunning] = useState(false);
-  const [completedSessions, setCompletedSessions] = useState(0);
-  const [topic, setTopic] = useState("");
-  const [sessions, setSessions] = useState([]);
-  const [focusPoints, setFocusPoints] = useState(0);
-  const [focusLevel, setFocusLevel] = useState(1);
-  const [sessionStart, setSessionStart] = useState(null);
-  const timerRef = useRef(null);
+const STORAGE_KEY = "campus_productivity_final_v1";
 
-  // Load from localStorage on mount
+export default function Productivity() {
+  const [state, setState] = useState({
+    durationMinutes: 25,
+    isRunning: false,
+    sessionStart: null, // timestamp ms
+    timeLeft: 25 * 60, // seconds
+    topic: "",
+    sessions: [], // completed sessions [{id, topic, duration, fp}]
+    focusPoints: 0,
+    completedSessions: 0,
+  });
+
+  // Load state once on mount
   useEffect(() => {
-    const savedData = JSON.parse(localStorage.getItem("productivityData"));
-    if (savedData) {
-      setTimeLeft(savedData.timeLeft);
-      setIsRunning(savedData.isRunning);
-      setCompletedSessions(savedData.completedSessions);
-      setSessions(savedData.sessions);
-      setFocusPoints(savedData.focusPoints);
-      setFocusLevel(savedData.focusLevel);
-      setSessionStart(savedData.sessionStart);
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const savedState = JSON.parse(raw);
+        const loadedState = {
+            ...savedState,
+            durationMinutes: Number(savedState.durationMinutes || 25),
+            focusPoints: Number(savedState.focusPoints || 0),
+            completedSessions: Number(savedState.completedSessions || 0),
+            sessions: savedState.sessions.map(s => ({
+                ...s, 
+                duration: Number(s.duration) 
+            }))
+        };
+        setState(loadedState);
+      }
+    } catch (err) {
+      console.warn("Failed to parse productivity storage", err);
     }
   }, []);
 
-  // Persist to localStorage on changes
+  // Persist state on ALL state changes
   useEffect(() => {
-    localStorage.setItem(
-      "productivityData",
-      JSON.stringify({
-        timeLeft,
-        isRunning,
-        completedSessions,
-        sessions,
-        focusPoints,
-        focusLevel,
-        sessionStart,
-      })
-    );
-  }, [timeLeft, isRunning, completedSessions, sessions, focusPoints, focusLevel, sessionStart]);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (window.BroadcastChannel) {
+        const ch = new BroadcastChannel("campus_prod_channel");
+        ch.postMessage({ type: "sync", payload: state });
+        ch.close();
+      } else {
+        localStorage.setItem("campus_prod_sync_ts", Date.now().toString());
+      }
+    } catch (err) {
+      console.warn("Failed to persist productivity", err);
+    }
+  }, [state]); 
 
-  // Timer logic (real-time persistent)
+  // Cross-tab sync (Unchanged)
   useEffect(() => {
-    if (isRunning && sessionStart) {
-      timerRef.current = setInterval(() => {
-        const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
-        const remaining = 25 * 60 - elapsed;
-        if (remaining <= 0) {
-          clearInterval(timerRef.current);
-          handleCompleteSession();
-        } else {
-          setTimeLeft(remaining);
+    const onStorage = (e) => {
+      if (!e.key) return;
+      if (e.key === STORAGE_KEY && e.newValue) {
+        try {
+          const remote = JSON.parse(e.newValue);
+          setState((cur) => ({ ...cur, ...remote }));
+        } catch {}
+      }
+      if (e.key === "campus_prod_sync_ts") {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) setState((cur) => ({ ...cur, ...JSON.parse(raw) }));
+        } catch {}
+      }
+    };
+    window.addEventListener("storage", onStorage);
+
+    let bc = null;
+    if (window.BroadcastChannel) {
+      bc = new BroadcastChannel("campus_prod_channel");
+      bc.onmessage = (m) => {
+        if (m.data && m.data.type === "sync" && m.data.payload) {
+          setState((cur) => ({ ...cur, ...m.data.payload }));
         }
-      }, 1000);
-    } else {
-      clearInterval(timerRef.current);
-    }
-    return () => clearInterval(timerRef.current);
-  }, [isRunning, sessionStart]);
-
-  const handleStartStop = () => {
-    if (isRunning) {
-      handleCompleteSession();
-    } else {
-      setSessionStart(Date.now() - (25 * 60 - timeLeft) * 1000);
-      setIsRunning(true);
-    }
-  };
-
-  const handleReset = () => {
-    clearInterval(timerRef.current);
-    setIsRunning(false);
-    setTimeLeft(25 * 60);
-    setSessionStart(null);
-  };
-
-  const handleCompleteSession = () => {
-    const duration = (25 * 60 - timeLeft) / 60;
-    const gainedFP = Math.round(duration * 2);
-    if (topic.trim() !== "") {
-      const newSession = {
-        id: Date.now(),
-        topic,
-        duration: duration.toFixed(2),
-        fp: gainedFP,
       };
-      const updatedSessions = [newSession, ...sessions];
-      const totalFP = focusPoints + gainedFP;
-
-      setSessions(updatedSessions);
-      setCompletedSessions((prev) => prev + 1);
-      setFocusPoints(totalFP);
-      setFocusLevel(Math.floor(totalFP / 100) + 1);
     }
-    setIsRunning(false);
-    setSessionStart(null);
-    setTimeLeft(25 * 60);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      if (bc) bc.close();
+    };
+  }, []);
+
+  // helper to partially update state
+  const updateState = (patch) => setState((s) => ({ ...s, ...patch }));
+
+  // Called when PomodoroTimer notifies a completed session
+  const handleSessionComplete = (minutesRecorded, topicText) => {
+    const recordedMins = Number(minutesRecorded); 
+    
+    let finalMins = recordedMins;
+    if (finalMins <= 0) {
+        if (state.isRunning) {
+            finalMins = 0.01; 
+        } else {
+            return; 
+        }
+    }
+    
+    if (isNaN(finalMins) || finalMins < 0) return;
+
+    const fp = Math.round(finalMins * 2);
+    const session = {
+      id: Date.now(),
+      topic: topicText || "Unknown",
+      duration: finalMins, 
+      fp,
+    };
+
+    setState(s => ({
+        ...s,
+        sessions: [session, ...s.sessions],
+        completedSessions: s.completedSessions + 1,
+        focusPoints: s.focusPoints + fp,
+        isRunning: false,
+        sessionStart: null,
+        timeLeft: s.durationMinutes * 60,
+        topic: "", 
+    }));
   };
 
-  const minutes = String(Math.floor(timeLeft / 60)).padStart(2, "0");
-  const seconds = String(timeLeft % 60).padStart(2, "0");
-  const progress = ((25 * 60 - timeLeft) / (25 * 60)) * 100;
-  const fpProgress = (focusPoints % 100);
+  // Reset everything
+  const handleResetAll = () => {
+    if (!window.confirm("Are you sure you want to reset ALL progress (sessions, points, etc.)? This cannot be undone.")) {
+        return;
+    }
+    const base = {
+      durationMinutes: 25,
+      isRunning: false,
+      sessionStart: null,
+      timeLeft: 25 * 60,
+      topic: "",
+      sessions: [],
+      focusPoints: 0,
+      completedSessions: 0,
+    };
+    setState(base);
+  };
 
   return (
     <div className="productivity-container">
-      <div className="productivity-header">
-        <h1 className="productivity-title">Productivity Suite</h1>
-        <p className="productivity-subtitle">
-          Boost your <span className="highlight">Focus Points (FP)</span> by completing Pomodoro sessions.
-          <br />Stay consistent to <span className="highlight">level up your focus!</span>
+      <div className="productivity-top">
+        <h1 className="productivity-title" style={{ display: 'inline' }}>Productivity Suite</h1>
+        {/* FIX: Move subtitle inline for single-line display */}
+        <p className="productivity-subtitle" style={{ display: 'inline', marginLeft: '10px' }}>
+          Boost your Focus Points (FP) by completing Pomodoro sessions.
         </p>
       </div>
 
-      <div className="top-section">
-        <div className="focus-info">
-          <p className="focus-level">Focus Level {focusLevel}</p>
-          <div className="fp-bar-container">
-            <div
-              className="fp-bar-fill"
-              style={{ width: `${fpProgress}%` }}
-            ></div>
+      <div className="prod-tab-row" style={{ display: 'none' }}>
+        {/* FIX: Hide the redundant tab row */}
+        <div className="tab-left">
+          <button className="tab-btn active">Pomodoro</button>
+        </div>
+      </div>
+
+      {/* FIX: Removed maxWidth from prod-main-grid style to allow it to spread */}
+      <div className="prod-main-grid" style={{ width: "100%" }}> 
+        <div className="prod-left">
+          <PomodoroTimer
+            durationMinutes={state.durationMinutes}
+            isRunning={state.isRunning}
+            sessionStart={state.sessionStart}
+            timeLeft={state.timeLeft}
+            topic={state.topic}
+            onChange={(patch) => updateState(patch)}
+            onComplete={(mins, t) => handleSessionComplete(mins, t)}
+          />
+          <div className="prod-local-controls" style={{ display: "flex", gap: "10px", marginTop: "16px", alignItems: "center", flexWrap: "wrap" }}>
+              <button className="btn btn-reset" onClick={handleResetAll}>Reset All Progress</button>
+              <button className="btn" onClick={() => window.open(window.location.href + "?mini=true", "_blank", "width=420,height=640")}>
+                  Open Mini Timer
+              </button>
+              <p className="muted" style={{ marginTop: 0, flexBasis: '100%', fontSize: '0.85rem' }}>Tip: open a mini window if you want a visible timer while browsing other sites.</p>
           </div>
-          <p className="fp-text">{focusPoints} FP</p>
         </div>
 
-        <div className="pomodoro-section">
-          <input
-            type="text"
-            placeholder="Enter topic (e.g. DSA Notes)"
-            className="topic-input"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-          />
-          <div className="pomodoro-timer">
-            <svg className="timer-ring" width="260" height="260">
-              <circle className="timer-bg" cx="130" cy="130" r="110" />
-              <circle
-                className="timer-progress"
-                cx="130"
-                cy="130"
-                r="110"
-                strokeDasharray="690"
-                strokeDashoffset={690 - (progress / 100) * 690}
-              />
-            </svg>
-            <div className="timer-display">
-              {minutes}:{seconds}
+        <aside className="prod-right">
+          <div className="sidebar-card">
+            <h3>Today's Progress</h3>
+            <div className="sidebar-row">
+              <div className="muted">Sessions Completed</div>
+              <div className="bold">{state.completedSessions}</div>
+            </div>
+
+            <div className="bar-bg">
+              <div className="bar-fill" style={{ width: `${Math.min(100, (state.completedSessions / 8) * 100)}%` }} />
+            </div>
+
+            <div className="sidebar-row" style={{ marginTop: 12 }}>
+              <div className="muted">XP Progress</div>
+              <div className="bold">{state.focusPoints % 100} / 100</div>
+            </div>
+            <div className="bar-bg">
+              <div className="bar-fill" style={{ width: `${state.focusPoints % 100}%` }} />
             </div>
           </div>
 
-          <div className="controls">
-            <button
-              onClick={handleStartStop}
-              className={`btn ${isRunning ? "btn-stop" : "btn-start"}`}
-            >
-              {isRunning ? "Stop & Record" : "Start"}
-            </button>
-            <button onClick={handleReset} className="btn btn-reset">
-              Reset
-            </button>
-          </div>
-          <p className="completed-text">Completed Sessions: {completedSessions}</p>
-        </div>
-      </div>
+          <div className="sidebar-card" style={{ marginTop: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <h3 style={{ margin: 0 }}>Recent Activity</h3>
+            </div>
 
-      <div className="recent-section">
-        <h3 className="recent-title">Recent Sessions</h3>
-        <div className="session-scroll">
-          {sessions.length === 0 ? (
-            <p className="no-sessions">No sessions yet. Start a Pomodoro to begin!</p>
-          ) : (
-            <ul className="session-list">
-              {sessions.map((s) => (
-                <li key={s.id} className="session-item">
-                  🕓 <strong>{s.topic}</strong> — {s.duration} min (+{s.fp} FP)
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+            <div style={{ marginTop: 12 }}>
+              {state.sessions.length === 0 ? (
+                <div className="muted">No activity yet. Complete a session to see it here.</div>
+              ) : (
+                <div className="recent-list">
+                  {state.sessions.slice(0, 6).map((s) => (
+                    <div key={s.id} className="recent-item">
+                      <div><strong>{s.topic}</strong></div>
+                      <div className="muted">{Number(s.duration).toFixed(2)} min • +{s.fp} FP</div> 
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="sidebar-card" style={{ marginTop: 16 }}>
+             <ProductivityAnalytics sessions={state.sessions} />
+          </div>
+          
+        </aside>
       </div>
     </div>
   );
-};
-
-export default Productivity;
+}

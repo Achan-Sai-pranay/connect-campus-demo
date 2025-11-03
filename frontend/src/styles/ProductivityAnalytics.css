@@ -1,0 +1,38 @@
+/* New style for the embedded analytics when no data exists */
+.analytics-empty-sidebar {
+  padding: 0; /* Already within the sidebar-card padding */
+  text-align: left;
+}
+
+/* Container for when analytics is in the sidebar */
+.analytics-container-sidebar {
+  padding: 0; 
+  color: #e6e9ff;
+}
+
+.analytics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.analytics-summary {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.analytics-chart-section {
+    margin-bottom: 16px;
+}
+
+.chart-title {
+  font-size: 1rem;
+  color: #d9c8ff;
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+/* Removed chart-empty styles as they are no longer relevant in the small sidebar context */

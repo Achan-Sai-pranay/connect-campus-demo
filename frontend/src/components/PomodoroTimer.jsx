@@ -1,95 +1,201 @@
-import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import "../styles/PomodoroTimer.css"; // 👈 add this line
+import React, { useEffect, useRef, useState } from "react";
+import "../styles/PomodoroTimer.css";
 
-const PomodoroTimer = ({ onSessionComplete }) => {
-  const [time, setTime] = useState(25 * 60);
-  const [isActive, setIsActive] = useState(false);
-  const [completed, setCompleted] = useState(0);
-  const [topic, setTopic] = useState("");
+/**
+ * Controlled PomodoroTimer with local editing to avoid input flicker.
+ * Props:
+ * - durationMinutes, isRunning, sessionStart, timeLeft, topic
+ * - onChange(patch) -> partial update to parent
+ * - onComplete(minutesRecorded, topic) -> tells parent a session finished
+ */
+export default function PomodoroTimer({
+  durationMinutes = 25,
+  isRunning = false,
+  sessionStart = null,
+  timeLeft = 25 * 60,
+  topic = "",
+  onChange = () => {},
+  onComplete = () => {},
+}) {
+  const [localDuration, setLocalDuration] = useState(durationMinutes);
+  const [localTopic, setLocalTopic] = useState(topic);
+  const [, setNow] = useState(Date.now());
+  const tickRef = useRef(null);
+  
+  // Ref for the duration value used by the timer logic
+  const durationRef = useRef(durationMinutes);
+  durationRef.current = durationMinutes;
+
+  // Sync local state with parent props
+  useEffect(() => {
+    if (!isRunning || durationMinutes !== localDuration) {
+        setLocalDuration(durationMinutes);
+    }
+  }, [durationMinutes, isRunning]);
 
   useEffect(() => {
-    let interval = null;
-    if (isActive && time > 0) {
-      interval = setInterval(() => setTime((t) => t - 1), 1000);
-    } else if (time === 0 && isActive) {
-      completeSession(25);
+    setLocalTopic(topic || "");
+  }, [topic]);
+
+  // Tick interval setup
+  useEffect(() => {
+    if (isRunning) {
+        if (tickRef.current) clearInterval(tickRef.current);
+        tickRef.current = setInterval(() => setNow(Date.now()), 1000);
+    } else {
+        clearInterval(tickRef.current);
     }
-    return () => clearInterval(interval);
-  }, [isActive, time]);
+    return () => clearInterval(tickRef.current);
+  }, [isRunning]);
 
-  const formatTime = (sec) => {
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  // --- Timer Calculation Logic ---
+  const totalSeconds = Math.max(1, Math.round(durationRef.current * 60));
+  let remaining = timeLeft;
+  if (isRunning && sessionStart) {
+    const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
+    remaining = Math.max(0, totalSeconds - elapsed);
+  } else {
+    remaining = typeof timeLeft === "number" ? timeLeft : totalSeconds;
+  }
+
+  // Formatting
+  const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
+  const ss = String(remaining % 60).padStart(2, "0");
+  
+  // Progress calculation
+  const progress = Math.min(100, Math.round(((totalSeconds - remaining) / totalSeconds) * 100));
+
+  // --- Handlers ---
+  const handleStart = () => {
+    const now = Date.now();
+    let sessionStartTs;
+    if (isRunning) return; 
+
+    if (remaining < totalSeconds && remaining > 0) {
+        sessionStartTs = now - (totalSeconds - remaining) * 1000;
+    } else {
+        sessionStartTs = now; 
+    }
+
+    onChange({
+      durationMinutes: localDuration, 
+      isRunning: true,
+      sessionStart: sessionStartTs,
+      timeLeft: remaining > 0 ? remaining : Math.round(localDuration * 60), 
+      topic: localTopic,
+    });
   };
 
-  const completeSession = (duration) => {
-    setIsActive(false);
-    setTime(25 * 60);
-    setCompleted((c) => c + 1);
-    onSessionComplete(duration, topic);
-    setTopic("");
+  const handlePause = () => onChange({ isRunning: false, sessionStart: null, timeLeft: remaining });
+
+  const handleReset = () => onChange({ isRunning: false, sessionStart: null, timeLeft: Math.round(localDuration * 60) });
+
+  const handleStopRecord = () => {
+    const recordedMinutes = (totalSeconds - remaining) / 60;
+    // Call onComplete to update parent state and record the session
+    onComplete(recordedMinutes, localTopic); 
   };
 
-  const handleStop = () => {
-    const elapsed = 25 - Math.floor(time / 60);
-    completeSession(elapsed);
+  // Auto-complete detection
+  useEffect(() => {
+    if (isRunning && remaining <= 0) {
+      onComplete(durationMinutes, localTopic);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [remaining, isRunning, durationMinutes]); 
+
+  // Local duration change logic
+  const onLocalDurationChange = (val) => {
+    if (val === "") {
+      setLocalDuration("");
+      return;
+    }
+    const n = Number(val);
+    if (Number.isNaN(n)) return;
+    const clamped = Math.max(1, Math.min(300, Math.floor(n)));
+    setLocalDuration(clamped);
   };
 
-  const progress = ((25 * 60 - time) / (25 * 60)) * 100;
+  const onDurationBlur = () => {
+    const final = Number(localDuration) || 1;
+    setLocalDuration(final);
+    onChange({ durationMinutes: final, timeLeft: final * 60, isRunning: false, sessionStart: null });
+  };
+
+  const onTopicBlur = () => {
+    onChange({ topic: localTopic });
+  };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h2 className="text-2xl font-semibold text-purple-400">Pomodoro Timer</h2>
+    <div className="pomodoro-card">
+      <h2 className="pomodoro-title">Pomodoro Timer</h2>
+      <p className="pomodoro-subtext">Focus session — editable length</p>
 
       <input
-        type="text"
-        value={topic}
-        onChange={(e) => setTopic(e.target.value)}
-        placeholder="Enter topic (e.g. DSA, OS Notes...)"
-        className="bg-[#1e1e35] text-gray-200 rounded-lg px-3 py-2 w-64 text-sm outline-none border border-purple-700/30 focus:border-purple-500 transition"
+        className="topic-input"
+        placeholder="Enter topic (e.g. DSA Notes)"
+        value={localTopic}
+        onChange={(e) => setLocalTopic(e.target.value)}
+        onBlur={onTopicBlur}
+        disabled={isRunning}
       />
 
-      <motion.div
-        className="timer-ring"
-        style={{ "--progress": `${progress}%` }}
-        animate={{ scale: isActive ? 1.03 : 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <div className="timer-inner">
-          <span className="timer-text">{formatTime(time)}</span>
+      <div className="duration-row">
+        <label className="muted">Session length (minutes)</label>
+        <input
+          type="number"
+          min="1"
+          max="300"
+          className="duration-input"
+          value={localDuration}
+          onChange={(e) => onLocalDurationChange(e.target.value)}
+          onBlur={onDurationBlur}
+          disabled={isRunning}
+        />
+      </div>
+
+      <div className="ring-wrapper">
+        <svg className="progress-ring" width="260" height="260">
+          <circle className="ring-bg" cx="130" cy="130" r="110" strokeWidth="12" />
+          <circle
+            className="ring-progress"
+            cx="130"
+            cy="130"
+            r="110"
+            strokeWidth="12"
+            strokeDasharray={2 * Math.PI * 110}
+            strokeDashoffset={(1 - progress / 100) * 2 * Math.PI * 110}
+          />
+        </svg>
+
+        <div className="time-display">
+          {mm}:{ss}
         </div>
-      </motion.div>
+      </div>
 
-      <div className="flex gap-3 mt-3">
-        <button
-          onClick={() => setIsActive(!isActive)}
-          className={`px-5 py-2 rounded-lg text-white ${
-            isActive ? "bg-orange-500 hover:bg-orange-600" : "bg-green-600 hover:bg-green-700"
-          } transition`}
-        >
-          {isActive ? "Pause" : "Start"}
-        </button>
-
-        <button
-          onClick={handleStop}
-          className="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition"
-        >
-          Stop
-        </button>
-
-        <button
-          onClick={() => setTime(25 * 60)}
-          className="px-5 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition"
-        >
+      <div className="controls">
+        {!isRunning ? (
+          <button className="btn start" onClick={handleStart}>
+            {remaining < totalSeconds && remaining > 0 ? "Resume" : "Start"}
+          </button>
+        ) : (
+          <>
+            <button className="btn pause" onClick={handlePause}>
+              Pause
+            </button>
+            <button className="btn stop" onClick={handleStopRecord}>
+              Stop & Record
+            </button>
+          </>
+        )}
+        <button className="btn reset" onClick={handleReset}>
           Reset
         </button>
       </div>
 
-      <p className="text-gray-400 text-sm mt-2">Completed Sessions: {completed}</p>
+      <div className="session-info">
+        <div className="muted">Completed sessions & recent activity appear in the right sidebar.</div>
+      </div>
     </div>
   );
-};
-
-export default PomodoroTimer;
+}

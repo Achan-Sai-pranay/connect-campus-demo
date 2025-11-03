@@ -1,61 +1,58 @@
-.pomodoro-page {
-  min-height: 100vh;
-  background: #0b0b18;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 4rem;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-}
-
 .pomodoro-card {
-  background: #141427;
-  border-radius: 24px;
-  padding: 2rem 3rem;
-  width: 420px;
-  box-shadow: 0 0 25px rgba(139, 92, 246, 0.25);
-  text-align: center;
+  background: linear-gradient(180deg, rgba(18,10,30,0.85), rgba(10,6,20,0.6));
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 8px 40px rgba(60,40,90,0.12);
+  width: 100%;
+  max-width: 720px;
 }
 
-.title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #c084fc;
-  margin-bottom: 0.25rem;
+.pomodoro-title {
+  font-size: 1.6rem;
+  color: #d9c0ff;
+  margin: 0 0 4px;
 }
 
-.subtitle {
-  color: #aaa;
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
+.pomodoro-subtext {
+  color: #bfaef8;
+  margin: 0 0 16px;
 }
 
-.stats {
-  display: flex;
-  justify-content: center;
-  gap: 0.5rem;
-  color: #c4b5fd;
-  margin-bottom: 1.5rem;
-}
-
+/* topic input */
 .topic-input {
   width: 100%;
-  padding: 0.6rem;
+  padding: 10px 12px;
   border-radius: 10px;
-  background: #1a1a2e;
-  color: #ddd;
-  text-align: center;
-  border: 1px solid #2d2b4e;
+  background: rgba(18,10,30,0.6);
+  border: 1px solid rgba(120,80,200,0.12);
+  color: #efe7ff;
   outline: none;
-  margin-bottom: 1.5rem;
+  box-sizing: border-box;
 }
 
+/* duration control */
+.duration-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.duration-input {
+  width: 110px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(120,80,200,0.12);
+  background: rgba(18,10,30,0.6);
+  color: #efe7ff;
+}
+
+/* ring */
 .ring-wrapper {
   position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width: 260px;
+  height: 260px;
+  margin: 22px auto;
 }
 
 .progress-ring {
@@ -64,91 +61,68 @@
 
 .ring-bg {
   fill: none;
-  stroke: #1a1a2e;
+  stroke: rgba(24,20,36,0.6);
 }
 
 .ring-progress {
   fill: none;
   stroke: #8b5cf6;
   stroke-linecap: round;
-  transition: stroke-dashoffset 0.3s linear;
-  filter: drop-shadow(0 0 10px #8b5cf6);
+  filter: drop-shadow(0 0 12px rgba(139,92,246,0.22));
+  transition: stroke-dashoffset 0.25s linear;
 }
 
 .time-display {
   position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 2rem;
-  font-weight: 600;
-  color: #c4b5fd;
+  color: #e6d9ff;
+  font-weight: 700;
 }
 
+/* controls */
 .controls {
   display: flex;
+  gap: 12px;
   justify-content: center;
-  gap: 1rem;
-  margin: 1.5rem 0;
+  margin-top: 12px;
 }
 
 .btn {
-  padding: 0.6rem 1.4rem;
-  border-radius: 12px;
-  font-weight: 600;
-  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 10px;
   border: none;
-  transition: 0.2s;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn.start {
+  background: linear-gradient(90deg,#8b5cf6,#6366f1);
+  color: white;
+  box-shadow: 0 6px 20px rgba(139,92,246,0.12);
+}
+
+.btn.pause {
+  background: linear-gradient(90deg,#f97316,#fb923c);
   color: white;
 }
 
-.start {
-  background: #7c3aed;
+.btn.stop {
+  background: linear-gradient(90deg,#ef4444,#f87171);
+  color: white;
 }
 
-.start:hover {
-  background: #6d28d9;
+.btn.reset {
+  background: rgba(30,20,50,0.6);
+  color: #d7cfff;
 }
 
-.pause {
-  background: #f97316;
-}
-
-.pause:hover {
-  background: #ea580c;
-}
-
-.reset {
-  background: #334155;
-}
-
-.reset:hover {
-  background: #475569;
-}
-
+/* session info */
 .session-info {
-  text-align: left;
-  margin-top: 1rem;
-}
-
-.session-info h3 {
-  color: #c084fc;
-  margin-bottom: 0.4rem;
-}
-
-.no-session {
-  color: #888;
-  font-size: 0.9rem;
-}
-
-.session-info ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.session-info li {
-  background: #1a1a2e;
-  border-radius: 10px;
-  padding: 0.4rem 0.6rem;
-  margin-bottom: 0.3rem;
-  color: #ddd;
-  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 12px;
+  color: #cfc6f9;
 }
