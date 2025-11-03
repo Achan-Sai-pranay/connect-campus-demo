@@ -10,36 +10,23 @@ const Navbar = () => {
       </div>
 
       <div className="nav-center">
-        <NavLink
-          to="/skills"
-          className={({ isActive }) =>
-            `nav-btn ${isActive ? "active" : ""}`
-          }
-        >
+        <NavLink to="/skills" className={({ isActive }) => `nav-btn ${isActive ? "active" : ""}`}>
           Skills Hub
         </NavLink>
 
-        <NavLink
-          to="/projects"
-          className={({ isActive }) =>
-            `nav-btn ${isActive ? "active" : ""}`
-          }
-        >
+        <NavLink to="/projects" className={({ isActive }) => `nav-btn ${isActive ? "active" : ""}`}>
           Projects
         </NavLink>
 
-        <NavLink
-          to="/productivity"
-          className={({ isActive }) =>
-            `nav-btn ${isActive ? "active" : ""}`
-          }
-        >
+        <NavLink to="/productivity" className={({ isActive }) => `nav-btn ${isActive ? "active" : ""}`}>
           Productivity
         </NavLink>
       </div>
 
       <div className="nav-right">
-        <button className="login-btn">Login</button>
+        <NavLink to="/login" className="login-btn">
+          Login
+        </NavLink>
       </div>
     </nav>
   );

@@ -1,0 +1,143 @@
+/* Import same font */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
+
+/* ===== Animated Gradient Background ===== */
+.register-wrapper {
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #5914ff, #7e2eff, #b04dff);
+  background-size: 300% 300%;
+  animation: gradientMove 8s ease infinite;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+}
+
+/* Gradient animation */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== Glassmorphism Card ===== */
+.register-form {
+  width: 450px;
+  padding: 50px 45px;
+  border-radius: 25px;
+
+  background: rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0px 0px 30px rgba(180, 118, 255, 0.8);
+
+  animation: scaleIn 0.6s ease, neonPulse 2s infinite alternate ease-in-out;
+  text-align: center;
+}
+
+/* In case backdrop-filter is not supported */
+@supports not ((backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px))) {
+  .register-form {
+    background: rgba(80, 30, 150, 0.7);
+  }
+}
+
+/* Card zoom effect */
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Neon glowing border effect */
+@keyframes neonPulse {
+  0% { box-shadow: 0 0 18px rgba(150, 98, 255, 0.4); }
+  100% { box-shadow: 0 0 40px rgba(185, 130, 255, 1); }
+}
+
+/* Title */
+.register-form h2 {
+  font-size: 2.4rem;
+  color: white;
+  margin-bottom: 30px;
+  font-weight: 700;
+}
+
+/* Input fields */
+.register-form input {
+  width: 100%;
+  padding: 14px;
+  margin: 12px 0;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  
+  transition: 0.3s ease;
+}
+
+.register-form input:focus {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(255, 200, 255, 1);
+}
+
+.register-form input::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Button */
+.register-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  border-radius: 50px;
+  border: none;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #6432ff, #a178ff, #b44dff);
+  background-size: 200% 200%;
+  animation: gradientButton 4s infinite alternate ease;
+  transition: 0.3s ease-in-out;
+}
+
+@keyframes gradientButton {
+  0% { background-position: left; }
+  100% { background-position: right; }
+}
+
+.register-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 18px rgba(180, 118, 255, 1);
+}
+
+.register-btn:active {
+  transform: scale(0.97);
+}
+
+/* Switch text */
+.switch-text {
+  margin-top: 18px;
+  color: rgb(230, 218, 255);
+  font-size: 14px;
+}
+
+.switch-link {
+  color: #ffda79;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.switch-link:hover {
+  text-decoration: underline;
+}
