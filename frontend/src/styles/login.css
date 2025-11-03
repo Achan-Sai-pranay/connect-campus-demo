@@ -1,0 +1,231 @@
+/* Import same font */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
+
+/* ---------- ADD THESE NEW EFFECTS ---------- */
+
+/* Floating shapes behind card */
+.login-wrapper::before,
+.login-wrapper::after,
+.register-wrapper::before,
+.register-wrapper::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.75;
+  animation: float 6s infinite alternate ease-in-out;
+}
+
+/* Floating Blob 1 */
+.login-wrapper::before,
+.register-wrapper::before {
+  width: 220px;
+  height: 220px;
+  background: rgba(255, 69, 255, 0.55);
+  top: 8%;
+  left: 12%;
+}
+
+/* Floating Blob 2 */
+.login-wrapper::after,
+.register-wrapper::after {
+  width: 260px;
+  height: 260px;
+  background: rgba(69, 144, 255, 0.45);
+  bottom: 12%;
+  right: 10%;
+}
+
+/* Floating animation */
+@keyframes float {
+  from {
+    transform: translateY(0px) scale(1);
+  }
+  to {
+    transform: translateY(-30px) scale(1.15);
+  }
+}
+
+/* ---------- BACKGROUND IMAGE ADDED ---------- */
+
+.login-wrapper,
+.register-wrapper {
+  position: relative;
+  overflow: hidden;
+  background-image: url("https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&q=80&w=1920");
+  background-size: cover;
+  background-position: center;
+}
+
+/* Optional dark overlay to make card glow more */
+.login-wrapper::after,
+.register-wrapper::after {
+  background: rgba(0, 0, 0, 0.3);
+  filter: blur(100px);
+}
+
+/* ===== Animated Background ===== */
+.login-wrapper {
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, #5914ff, #7e2eff, #b04dff);
+  background-size: 300% 300%;
+  animation: gradientMove 8s ease infinite;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Gradient animation */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== Login Card (Glassmorphism + Neon Border Glow) ===== */
+.login-form {
+  width: 380px;
+  padding: 48px 42px;
+  border-radius: 20px;
+
+  background: rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border: 2px solid rgba(255, 255, 255, 0.17);
+  box-shadow: 0px 0px 18px rgba(255, 255, 255, 0.18);
+
+  animation: scaleIn 0.8s ease, neonPulse 2.2s infinite alternate ease-in-out;
+  text-align: center;
+}
+
+/* Card appears smoothly */
+@keyframes scaleIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Neon glow pulse */
+@keyframes neonPulse {
+  0% { box-shadow: 0px 0px 15px rgba(150, 98, 255, 0.3); }
+  100% { box-shadow: 0px 0px 35px rgba(180, 118, 255, 0.9); }
+}
+
+/* Heading */
+.login-form h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 28px;
+  letter-spacing: 1px;
+}
+
+/* ===== Input Fields ===== */
+.login-form input {
+  width: 100%;
+  padding: 14px;
+  margin: 14px 0;
+  border-radius: 10px;
+  border: none;
+  outline: none;
+
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+
+  transition: 0.3s ease;
+}
+
+/* Glow animation on focus */
+.login-form input:focus {
+  background: rgba(255, 255, 255, 0.28);
+  transform: scale(1.05);
+  box-shadow: 0px 0px 12px rgba(200, 150, 255, 0.9);
+}
+
+/* Placeholder color */
+.login-form input::placeholder {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ===== Login Button ===== */
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 18px;
+  border-radius: 50px;
+  border: none;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #6432ff, #a178ff, #b44dff);
+  background-size: 200% 200%;
+  animation: gradientButton 4s infinite alternate ease;
+
+  transition: 0.3s ease-in-out;
+}
+
+/* Button gradient moves */
+@keyframes gradientButton {
+  0% { background-position: left; }
+  100% { background-position: right; }
+}
+
+/* Hover neon effect */
+.login-btn:hover {
+  transform: scale(1.09);
+  box-shadow: 0px 0px 18px rgba(180, 118, 255, 0.9);
+}
+
+/* Click pulse effect */
+.login-btn:active {
+  transform: scale(0.97);
+}
+
+/* ===== Optional Sign Up Link ===== */
+.signup-text {
+  margin-top: 18px;
+  color: rgb(230, 218, 255);
+  font-size: 14px;
+}
+
+.signup-text a {
+  color: #ffffff;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.signup-text a:hover {
+  text-decoration: underline;
+}
+.switch-text {
+  color: white;
+  margin-top: 15px;
+}
+
+.switch-link {
+  color: #ffda79;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.switch-link:hover {
+  text-decoration: underline;
+}
+.auth-illustration {
+  width: 75px;
+  margin-bottom: 18px;
+  animation: bounce 2s infinite ease;
+}
+
+/* bouncing animation */
+@keyframes bounce {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
