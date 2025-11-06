@@ -84,11 +84,13 @@
   letter-spacing: 1px;
 }
 
-/* Input Fields */
+/* ✅ UPDATED INPUT FIELDS */
 .input-container {
   position: relative;
   width: 100%;
+  transition: 0.3s ease;
 }
+
 .input-container i {
   position: absolute;
   left: 15px;
@@ -96,7 +98,9 @@
   transform: translateY(-50%);
   font-size: 1.2rem;
   color: rgb(255, 220, 255);
+  transition: 0.3s ease;
 }
+
 .register-form input {
   width: 100%;
   padding: 14px 45px;
@@ -109,11 +113,17 @@
   color: white;
   transition: 0.3s ease;
 }
-.register-form input:focus {
+
+/* 🔥 When focused: Input + Icon both scale */
+.input-container:focus-within {
+  transform: scale(1.07);
+}
+
+.input-container:focus-within input {
   background: rgba(255, 255, 255, 0.35);
-  transform: scale(1.05);
   box-shadow: 0 0 15px rgba(255, 170, 255, 1);
 }
+
 ::placeholder {
   color: rgba(255, 255, 255, 0.72);
 }
@@ -149,8 +159,8 @@
   color: white;
   display: flex;
   flex-direction: column;
-  justify-content: center;  /* center vertically */
-  align-items: center;      /* center horizontally */
+  justify-content: center;
+  align-items: center;
 }
 
 /* Login Text Above */
@@ -207,6 +217,7 @@
   margin-top: 12px;
   transition: 0.3s ease;
 }
+
 .google-btn:hover {
   transform: scale(1.1);
   box-shadow: 0 0 25px white;
