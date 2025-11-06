@@ -1,31 +1,38 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import API_BASE_URL from "../utils/api"; // This imports the (now corrected) URL
+import API_BASE_URL from "../utils/api";
 import "../styles/register.css";
 
 const Register = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  // State for user feedback (better than alert())
-  const [message, setMessage] = useState(null); 
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
-    setMessage(null); // Clear previous messages
+    setMessage(null);
     setIsLoading(true);
 
+    const { name, email, password, confirmPassword } = formData;
+
     if (password !== confirmPassword) {
-      setMessage({ type: 'error', text: "Passwords do not match ❌" });
+      setMessage({ type: "error", text: "Passwords do not match ❌" });
       setIsLoading(false);
       return;
     }
 
     try {
-      // The API call uses the imported (and hopefully corrected) URL
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -35,33 +42,22 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage({ type: 'success', text: "Registration Successful! Redirecting..." });
+        setMessage({ type: "success", text: "Registration Successful ✅ Redirecting..." });
         localStorage.setItem("token", data.token);
-        // Navigate after success
-        setTimeout(() => {
-          navigate("/dashboard"); 
-        }, 1500);
 
+        setTimeout(() => navigate("/dashboard"), 1500);
       } else {
-        // Server responded with an error (e.g., 400 validation error)
-        setMessage({ type: 'error', text: data.message || "Registration failed. Please try again." });
+        setMessage({ type: "error", text: data.message || "Registration failed!" });
       }
     } catch (error) {
-      // This is the error you are likely getting now (Network/Connection refused)
       console.error("Network Error:", error);
-      setMessage({ 
-        type: 'error', 
-        text: `Connection failed. Is the backend server running at ${API_BASE_URL}?` 
+      setMessage({
+        type: "error",
+        text: `Connection failed ❌ Backend not reachable at: ${API_BASE_URL}`,
       });
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const renderMessage = () => {
-    if (!message) return null;
-    const className = message.type === 'success' ? 'success-message' : 'error-message';
-    return <p className={className}>{message.text}</p>;
   };
 
   return (
@@ -69,47 +65,53 @@ const Register = () => {
       <form className="register-form" onSubmit={handleRegister}>
         <h2>Create Account</h2>
 
-        {renderMessage()} 
-        
-        <input 
-          type="text" 
-          placeholder="Full Name" 
-          value={name}
-          onChange={(e) => setName(e.target.value)} 
-          disabled={isLoading}
-          required 
-        />
-        {/* ... other inputs (email, password, confirmPassword) ... */}
-        <input 
-          type="email" 
-          placeholder="Email Address" 
-          value={email}
-          onChange={(e) => setEmail(e.target.value)} 
-          disabled={isLoading}
-          required
-        />
-        <input 
-          type="password" 
-          placeholder="Password" 
-          value={password}
-          onChange={(e) => setPassword(e.target.value)} 
-          disabled={isLoading}
-          required
-        />
-        <input 
-          type="password" 
-          placeholder="Confirm Password" 
-          value={confirmPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)} 
+        {message && (
+          <p className={message.type === "success" ? "success-message" : "error-message"}>
+            {message.text}
+          </p>
+        )}
+
+        <input
+          name="name"
+          type="text"
+          placeholder="Full Name"
+          value={formData.name}
+          onChange={handleChange}
           disabled={isLoading}
           required
         />
 
-        <button 
-          className="register-btn" 
-          type="submit"
+        <input
+          name="email"
+          type="email"
+          placeholder="Email Address"
+          value={formData.email}
+          onChange={handleChange}
           disabled={isLoading}
-        >
+          required
+        />
+
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          value={formData.password}
+          onChange={handleChange}
+          disabled={isLoading}
+          required
+        />
+
+        <input
+          name="confirmPassword"
+          type="password"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          disabled={isLoading}
+          required
+        />
+
+        <button type="submit" className="register-btn" disabled={isLoading}>
           {isLoading ? "Registering..." : "Register"}
         </button>
 

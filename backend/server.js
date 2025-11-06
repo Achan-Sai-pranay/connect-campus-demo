@@ -11,7 +11,11 @@ connectDB();
 const app = express();
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  credentials: true,
+}));
+
 app.use(express.json()); // Allows JSON body parsing
 
 app.get("/", (req, res) => {
