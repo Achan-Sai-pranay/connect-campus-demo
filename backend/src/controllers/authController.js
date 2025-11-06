@@ -1,57 +1,56 @@
-import User from "../models/user.js";
+import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+// ✅ REGISTER (Normal signup)
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    // Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser)
-      return res.status(400).json({ message: "Email already in use" });
+      return res.status(400).json({ message: "User already exists ❌" });
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const user = await User.create({
+    const newUser = await User.create({
       name,
       email,
       password: hashedPassword,
     });
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-    res.status(201).json({ message: "Registration successful", token });
+    res.status(201).json({ token });
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({ message: "Server Error ❌" });
   }
 };
 
-export const loginUser = async (req, res) => {
+// ✅ GOOGLE REGISTER / LOGIN
+export const googleRegister = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { name, email } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user)
-      return res.status(404).json({ message: "Invalid email or password" });
+    let user = await User.findOne({ email });
 
-    const isPasswordCorrect = await bcrypt.compare(password, user.password);
-    if (!isPasswordCorrect)
-      return res.status(404).json({ message: "Invalid email or password" });
+    if (!user) {
+      // create new user if not exist
+      user = await User.create({
+        name,
+        email,
+        authType: "google",
+      });
+    }
 
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
 
-    res.status(200).json({ message: "Login successful", token });
+    res.json({ token });
   } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+    res.status(500).json({ message: "Google Auth Failed ❌" });
   }
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import XPHeader from "./XPHeader";
 import SkillCard from "./SkillCard";
 import SkillModal from "./SkillModal";
@@ -10,16 +10,46 @@ const SkillsHub = () => {
 
   const [skills, setSkills] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [users, setUsers] = useState([]);
 
-  const [users, setUsers] = useState([
-    { rank: 1, name: "Alex Chen", level: 12, xp: 2850 },
-    { rank: 2, name: "Sarah Kumar", level: 11, xp: 2640 },
-    { rank: 3, name: "Mike Johnson", level: 11, xp: 2420 },
-    { rank: 4, name: "Emma Davis", level: 10, xp: 2180 },
-    { rank: 5, name: currentUser, level: 9, xp: 1850 },
-  ]);
+  // Load initial data from localStorage
+  useEffect(() => {
+    const savedSkills = JSON.parse(localStorage.getItem("skillsHub_skills")) || [];
+    const savedUsers = JSON.parse(localStorage.getItem("skillsHub_users")) || [
+      { rank: 1, name: "Alex Chen", level: 12, xp: 2850 },
+      { rank: 2, name: "Sarah Kumar", level: 11, xp: 2640 },
+      { rank: 3, name: "Mike Johnson", level: 11, xp: 2420 },
+      { rank: 4, name: "Emma Davis", level: 10, xp: 2180 },
+      { rank: 5, name: currentUser, level: 9, xp: 1850 },
+    ];
+    setSkills(savedSkills);
+    setUsers(savedUsers);
+  }, []);
 
-  // Add a new help request (from SkillModal)
+  // Save whenever data changes
+  useEffect(() => {
+    localStorage.setItem("skillsHub_skills", JSON.stringify(skills));
+  }, [skills]);
+
+  useEffect(() => {
+    localStorage.setItem("skillsHub_users", JSON.stringify(users));
+  }, [users]);
+
+  // 🔁 Sync between multiple tabs
+  useEffect(() => {
+    const syncHandler = (e) => {
+      if (e.key === "skillsHub_skills") {
+        setSkills(JSON.parse(e.newValue || "[]"));
+      }
+      if (e.key === "skillsHub_users") {
+        setUsers(JSON.parse(e.newValue || "[]"));
+      }
+    };
+    window.addEventListener("storage", syncHandler);
+    return () => window.removeEventListener("storage", syncHandler);
+  }, []);
+
+  // ➕ Add a new help request
   const handleAddSkill = (skill) => {
     const newSkill = {
       ...skill,
@@ -28,39 +58,47 @@ const SkillsHub = () => {
       status: "open",
       acceptedBy: null,
     };
-    setSkills((prev) => [newSkill, ...prev]);
+    const updated = [newSkill, ...skills];
+    setSkills(updated);
+    localStorage.setItem("skillsHub_skills", JSON.stringify(updated));
   };
 
-  // Accept a request
+  // ✅ Accept a request
   const handleAcceptRequest = (id, accepter) => {
-    setSkills((prev) =>
-      prev.map((s) =>
-        s.id === id && s.status === "open"
-          ? { ...s, status: "accepted", acceptedBy: accepter }
-          : s
-      )
+    const updated = skills.map((s) =>
+      s.id === id && s.status === "open"
+        ? { ...s, status: "accepted", acceptedBy: accepter }
+        : s
     );
+    setSkills(updated);
+    localStorage.setItem("skillsHub_skills", JSON.stringify(updated));
   };
 
-  // Mark completed (call end)
+  // 🏁 Mark completed (call end)
   const handleCompleteRequest = (id) => {
-    setSkills((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, status: "completed" } : s))
+    const updated = skills.map((s) =>
+      s.id === id ? { ...s, status: "completed" } : s
     );
+    setSkills(updated);
+    localStorage.setItem("skillsHub_skills", JSON.stringify(updated));
   };
 
-  // Update XP for a user (single source of truth here)
+  // ⚡ Update XP (and level)
   const handleXpUpdate = (userName, xpGain) => {
-    setUsers((prev) =>
-      prev.map((u) =>
-        u.name === userName
-          ? { ...u, xp: u.xp + xpGain, level: Math.floor((u.xp + xpGain) / 100) + 1 }
-          : u
-      )
+    const updated = users.map((u) =>
+      u.name === userName
+        ? {
+            ...u,
+            xp: u.xp + xpGain,
+            level: Math.floor((u.xp + xpGain) / 100) + 1,
+          }
+        : u
     );
+    setUsers(updated);
+    localStorage.setItem("skillsHub_users", JSON.stringify(updated));
   };
 
-  // XPHeader data from currentUser
+  // 🧠 User info
   const currentUserData = users.find((u) => u.name === currentUser);
   const userXP = currentUserData ? currentUserData.xp : 0;
   const userLevel = currentUserData ? currentUserData.level : 1;
@@ -78,13 +116,18 @@ const SkillsHub = () => {
               <p>See who’s asking for what & collaborate</p>
             </div>
 
-            <button className="request-btn" onClick={() => setIsModalOpen(true)}>
+            <button
+              className="request-btn"
+              onClick={() => setIsModalOpen(true)}
+            >
               + Request Help
             </button>
           </div>
 
           {skills.length === 0 ? (
-            <p className="empty-state">No requests yet. Click “Request Help” to start!</p>
+            <p className="empty-state">
+              No requests yet. Click “Request Help” to start!
+            </p>
           ) : (
             <div className="skills-list">
               {skills.map((skill) => (
@@ -104,12 +147,19 @@ const SkillsHub = () => {
         {/* RIGHT LEADERBOARD */}
         <div className="leaderboard-section">
           <Leaderboard
-            users={[...users].sort((a, b) => b.xp - a.xp).map((u, i) => ({ ...u, rank: i + 1 }))}
+            users={[...users]
+              .sort((a, b) => b.xp - a.xp)
+              .map((u, i) => ({ ...u, rank: i + 1 }))}
           />
         </div>
       </div>
 
-      {isModalOpen && <SkillModal onAddSkill={handleAddSkill} onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && (
+        <SkillModal
+          onAddSkill={handleAddSkill}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
