@@ -1,14 +1,14 @@
-/* Import same font */
+/* Import Font */
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
 
-/* ===== Animated Gradient Background ===== */
+/* ===== MAIN WRAPPER ===== */
 .register-wrapper {
   height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #5914ff, #7e2eff, #b04dff);
+  position: relative;
+  background: linear-gradient(120deg, #571aff, #8f3aff, #f76fff);
   background-size: 300% 300%;
-  animation: gradientMove 8s ease infinite;
-
+  animation: bgShift 12s ease infinite;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -16,84 +16,109 @@
   overflow: hidden;
 }
 
-/* Gradient animation */
-@keyframes gradientMove {
+/* Floating particles */
+.register-wrapper::before,
+.register-wrapper::after {
+  content: "";
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent);
+  filter: blur(90px);
+  animation: floatBubble 7s infinite alternate ease-in-out;
+}
+
+.register-wrapper::before { top: -50px; left: -80px; }
+.register-wrapper::after { bottom: -50px; right: -80px; }
+
+/* Background Animation */
+@keyframes bgShift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* ===== Glassmorphism Card ===== */
-.register-form {
-  width: 450px;
-  padding: 50px 45px;
+/* Bubble animation */
+@keyframes floatBubble {
+  from { transform: translateY(0px); }
+  to { transform: translateY(50px); }
+}
+
+/* ===== MAIN CARD ===== */
+.register-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 850px;
+  padding: 45px;
   border-radius: 25px;
-
   background: rgba(255, 255, 255, 0.12);
-  -webkit-backdrop-filter: blur(22px);
-  backdrop-filter: blur(22px);
+  border: 2px solid rgba(255, 255, 255, 0.28);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  animation: cardPop 0.7s ease-out, floatUpDown 3s infinite ease-in-out;
+}
 
-  border: 2px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0px 0px 30px rgba(180, 118, 255, 0.8);
+/* Animations */
+@keyframes cardPop {
+  from { opacity: 0; transform: translateY(30px) scale(0.9); }
+  to { opacity: 1; transform: translateY(0px) scale(1); }
+}
+@keyframes floatUpDown {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
 
-  animation: scaleIn 0.6s ease, neonPulse 2s infinite alternate ease-in-out;
+/* ===== LEFT FORM ===== */
+.register-form {
+  width: 50%;
   text-align: center;
 }
 
-/* In case backdrop-filter is not supported */
-@supports not ((backdrop-filter: blur(20px)) or (-webkit-backdrop-filter: blur(20px))) {
-  .register-form {
-    background: rgba(80, 30, 150, 0.7);
-  }
-}
-
-/* Card zoom effect */
-@keyframes scaleIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-/* Neon glowing border effect */
-@keyframes neonPulse {
-  0% { box-shadow: 0 0 18px rgba(150, 98, 255, 0.4); }
-  100% { box-shadow: 0 0 40px rgba(185, 130, 255, 1); }
-}
-
-/* Title */
 .register-form h2 {
   font-size: 2.4rem;
-  color: white;
-  margin-bottom: 30px;
   font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 25px;
+  letter-spacing: 1px;
 }
 
-/* Input fields */
+/* Input Fields */
+.input-container {
+  position: relative;
+  width: 100%;
+}
+.input-container i {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1.2rem;
+  color: rgb(255, 220, 255);
+}
 .register-form input {
   width: 100%;
-  padding: 14px;
+  padding: 14px 45px;
   margin: 12px 0;
   border-radius: 10px;
   border: none;
   outline: none;
   font-size: 1rem;
-
   background: rgba(255, 255, 255, 0.18);
   color: white;
-  
   transition: 0.3s ease;
 }
-
 .register-form input:focus {
   background: rgba(255, 255, 255, 0.35);
   transform: scale(1.05);
-  box-shadow: 0 0 10px rgba(255, 200, 255, 1);
+  box-shadow: 0 0 15px rgba(255, 170, 255, 1);
+}
+::placeholder {
+  color: rgba(255, 255, 255, 0.72);
 }
 
-.register-form input::placeholder {
-  color: rgba(255, 255, 255, 0.75);
-}
-
-/* Button */
+/* Submit Button */
 .register-btn {
   width: 100%;
   padding: 14px;
@@ -101,43 +126,93 @@
   border-radius: 50px;
   border: none;
   font-size: 1.25rem;
-  font-weight: 600;
   color: white;
+  font-weight: 600;
   cursor: pointer;
-
-  background: linear-gradient(135deg, #6432ff, #a178ff, #b44dff);
+  background: linear-gradient(135deg, #6a3aff, #b85aff, #f76fff);
   background-size: 200% 200%;
-  animation: gradientButton 4s infinite alternate ease;
-  transition: 0.3s ease-in-out;
+  animation: btnGradient 4s infinite alternate ease-in-out;
 }
-
-@keyframes gradientButton {
+@keyframes btnGradient {
   0% { background-position: left; }
   100% { background-position: right; }
 }
-
 .register-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 18px rgba(180, 118, 255, 1);
+  transform: scale(1.12);
+  box-shadow: 0 0 25px rgba(255, 168, 255, 1);
 }
 
-.register-btn:active {
-  transform: scale(0.97);
+/* ===== RIGHT AREA (Login + Google) ===== */
+.google-container {
+  width: 45%;
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;  /* center vertically */
+  align-items: center;      /* center horizontally */
 }
 
-/* Switch text */
-.switch-text {
-  margin-top: 18px;
-  color: rgb(230, 218, 255);
-  font-size: 14px;
+/* Login Text Above */
+.already-account {
+  margin-bottom: 22px;
+  font-size: 15px;
+  color: #f2f2f2;
 }
-
-.switch-link {
-  color: #ffda79;
+.already-account a {
+  color: #fff;
   font-weight: bold;
   text-decoration: none;
 }
-
-.switch-link:hover {
+.already-account a:hover {
   text-decoration: underline;
+}
+
+/* OR Divider */
+.divider {
+  width: 85%;
+  margin: 12px auto 22px auto;
+  font-size: 14px;
+  color: rgb(240, 240, 240);
+  opacity: 0.8;
+  position: relative;
+}
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 42%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.35);
+}
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+/* Google Button (Centered Exactly Below OR) */
+.google-btn {
+  width: 85%;
+  padding: 14px;
+  border-radius: 50px;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: none;
+  color: #333;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: 0.3s ease;
+}
+.google-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 25px white;
+}
+
+.google-btn img {
+  width: 24px;
+  height: 24px;
 }

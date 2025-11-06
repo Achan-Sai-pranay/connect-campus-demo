@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { FiMail, FiLock } from "react-icons/fi"; // Icons
 import API_BASE_URL from "../utils/api";
 import "../styles/login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,25 +21,57 @@ const Login = () => {
     const data = await response.json();
 
     if (response.ok) {
-      alert("Login Successful ✅");
+      alert("✅ Login Successful");
       localStorage.setItem("token", data.token);
+
+      navigate("/"); // redirect after login
     } else {
-      alert(data.message);
+      alert(data.message || "Login failed!");
     }
   };
 
   return (
     <div className="login-wrapper">
-      <div className="login-form">
-        <h2>Login</h2>
 
-        <input type="email" placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+      {/* Form Card */}
+      <div className="login-card">
 
-        <button className="login-btn" onClick={handleSubmit}>Login</button>
+        <h2>Welcome Back</h2>
+        <p className="subtitle">Login to continue 🚀</p>
 
+        <form onSubmit={handleSubmit}>
+
+          {/* Email Input */}
+          <div className="input-group">
+            <FiMail className="input-icon" />
+            <input
+              type="email"
+              placeholder="Enter Email"
+              required
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          {/* Password Input */}
+          <div className="input-group">
+            <FiLock className="input-icon" />
+            <input
+              type="password"
+              placeholder="Enter Password"
+              required
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          {/* Button */}
+          <button type="submit" className="login-btn">
+            Login
+          </button>
+        </form>
+
+        {/* Register Redirect */}
         <p className="no-account">
-          Don’t have an account? <Link to="/register">Register</Link>
+          Don't have an account? <Link to="/register">Register</Link>
         </p>
       </div>
     </div>

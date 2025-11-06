@@ -1,30 +1,25 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { auth, googleProvider } from "../firebase";
+import { signInWithPopup } from "firebase/auth";
 import API_BASE_URL from "../utils/api";
 import "../styles/register.css";
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
+  /** ✅ NORMAL FORM REGISTER */
   const handleRegister = async (e) => {
     e.preventDefault();
     setMessage(null);
     setIsLoading(true);
-
-    const { name, email, password, confirmPassword } = formData;
 
     if (password !== confirmPassword) {
       setMessage({ type: "error", text: "Passwords do not match ❌" });
@@ -47,78 +42,125 @@ const Register = () => {
 
         setTimeout(() => navigate("/dashboard"), 1500);
       } else {
-        setMessage({ type: "error", text: data.message || "Registration failed!" });
+        setMessage({ type: "error", text: data.message || "Something went wrong" });
       }
-    } catch (error) {
-      console.error("Network Error:", error);
+    } catch {
       setMessage({
         type: "error",
-        text: `Connection failed ❌ Backend not reachable at: ${API_BASE_URL}`,
+        text: `Connection failed. Check your backend at: ${API_BASE_URL}`,
       });
     } finally {
       setIsLoading(false);
     }
   };
 
+  /** ✅ GOOGLE SIGN UP */
+  const handleGoogleSignup = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      const googleUser = result.user;
+
+      const response = await fetch(`${API_BASE_URL}/api/auth/google-register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: googleUser.displayName,
+          email: googleUser.email,
+        }),
+      });
+
+      const data = await response.json();
+      localStorage.setItem("token", data.token);
+
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Google Signup Error:", error);
+      setMessage({ type: "error", text: "Google sign-in failed ❌" });
+    }
+  };
+
   return (
     <div className="register-wrapper">
-      <form className="register-form" onSubmit={handleRegister}>
-        <h2>Create Account</h2>
 
-        {message && (
-          <p className={message.type === "success" ? "success-message" : "error-message"}>
-            {message.text}
+      <div className="register-card">
+
+        {/* LEFT SIDE FORM */}
+        <form className="register-form" onSubmit={handleRegister}>
+          <h2>Create Account</h2>
+
+          {message && (
+            <p className={message.type === "success" ? "success-message" : "error-message"}>
+              {message.text}
+            </p>
+          )}
+
+          <div className="input-container">
+            <i className="fa-solid fa-user"></i>
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-container">
+            <i className="fa-solid fa-envelope"></i>
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-container">
+            <i className="fa-solid fa-lock"></i>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <div className="input-container">
+            <i className="fa-solid fa-lock"></i>
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button className="register-btn" type="submit" disabled={isLoading}>
+            {isLoading ? "Registering..." : "Register"}
+          </button>
+        </form>
+
+        {/* ✅ RIGHT SIDE GOOGLE SIGNUP CARD */}
+        <div className="google-container">
+
+          {/* 🚀 Moved Login text here */}
+          <p className="already-account">
+            Already have an account? <Link to="/login">Login</Link>
           </p>
-        )}
 
-        <input
-          name="name"
-          type="text"
-          placeholder="Full Name"
-          value={formData.name}
-          onChange={handleChange}
-          disabled={isLoading}
-          required
-        />
+          {/* Divider */}
+          <div className="divider">or</div>
 
-        <input
-          name="email"
-          type="email"
-          placeholder="Email Address"
-          value={formData.email}
-          onChange={handleChange}
-          disabled={isLoading}
-          required
-        />
+          <button className="google-btn" onClick={handleGoogleSignup}>
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google Icon" />
+            Continue with Google
+          </button>
+        </div>
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          disabled={isLoading}
-          required
-        />
-
-        <input
-          name="confirmPassword"
-          type="password"
-          placeholder="Confirm Password"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          disabled={isLoading}
-          required
-        />
-
-        <button type="submit" className="register-btn" disabled={isLoading}>
-          {isLoading ? "Registering..." : "Register"}
-        </button>
-
-        <p className="switch-text">
-          Already have an account? <Link to="/login" className="switch-link">Login</Link>
-        </p>
-      </form>
+      </div>
     </div>
   );
 };
