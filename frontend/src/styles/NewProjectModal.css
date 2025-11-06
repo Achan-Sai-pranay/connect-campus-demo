@@ -1,0 +1,8 @@
+.modal-overlay { position:fixed; inset:0; background: rgba(11,11,23,0.7); display:flex; align-items:center; justify-content:center; z-index:100; }
+.modal { width:400px; background:#0f0f1a; border-radius:12px; padding:1.6rem; border:1px solid rgba(45,45,70,0.6); color:#eef0ff; }
+.modal h2 { color:#c6b4ff; margin-bottom:0.5rem; }
+.modal label { display:block; margin-top:0.6rem; color:#bdb7d9; }
+.modal input, .modal select { width:100%; background:#121224; border:1px solid rgba(45,45,70,0.6); padding:0.5rem; border-radius:8px; color:#eef0ff; margin-top:0.3rem; }
+.modal-actions { display:flex; justify-content:flex-end; gap:0.8rem; margin-top:1rem; }
+.cancel-btn { background:#232333; color:#cfcde7; padding:0.5rem 1rem; border-radius:8px; border:none; cursor:pointer; }
+.save-btn { background:linear-gradient(90deg,#6d28d9,#4f46e5); color:#fff; padding:0.5rem 1rem; border-radius:8px; border:none; cursor:pointer; }

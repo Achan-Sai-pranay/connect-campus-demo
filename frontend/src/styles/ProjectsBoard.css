@@ -1,0 +1,46 @@
+.projects-board {
+  padding: 2rem;
+  color: #f2f2f9;
+}
+
+.projects-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.8rem;
+}
+
+.projects-header h2 {
+  font-size: 1.6rem;
+  color: #c6b4ff;
+}
+
+.projects-header p {
+  color: #9ca3af;
+  margin-top: 0.15rem;
+  font-size: 0.95rem;
+}
+
+.new-project-btn {
+  background: linear-gradient(90deg, #6d28d9, #4f46e5);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.18s;
+  box-shadow: 0 6px 18px rgba(79,70,229,0.18);
+}
+
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.completed-title {
+  margin-top: 2rem;
+  color: #bfb3ff;
+  font-weight: 600;
+}

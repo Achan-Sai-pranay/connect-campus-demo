@@ -1,7 +1,18 @@
 import React from "react";
-const Projects = () => (
-  <div style={{ padding: "2rem", color: "#fff" }}>
-    <h1>Projects Board</h1>
-  </div>
-);
+import { motion } from "framer-motion";
+import ProjectsBoard from "./ProjectsBoard";
+
+const Projects = () => {
+  return (
+    <motion.div
+      className="min-h-screen font-sans antialiased text-white bg-[#0B0B23]"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      <ProjectsBoard />
+    </motion.div>
+  );
+};
+
 export default Projects;

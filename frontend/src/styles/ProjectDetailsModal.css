@@ -1,0 +1,33 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(11,11,23,0.7);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:100;
+}
+
+.details-modal {
+  width:460px;
+  background: linear-gradient(180deg,#0f0f16,#0b0b19);
+  border-radius:12px;
+  padding:1.6rem;
+  border:1px solid rgba(45,45,70,0.6);
+  color:#eef0ff;
+}
+
+.details-modal h2 { margin:0 0 0.8rem 0; font-size:1.15rem; }
+.inline-title { width:100%; background:transparent; border:none; color:#eae6ff; font-size:1.05rem; font-weight:700; outline:none; }
+
+.status-line, .modal-info .row, .team-section { margin-top:0.9rem; display:flex; gap:0.6rem; align-items:center; justify-content:space-between; }
+.status-line label, .modal-info label, .team-section label { color:#bdb7d9; font-size:0.9rem; width: 36%; }
+.modal-info input, .team-section input, .status-line select { width:62%; background:#121224; border:1px solid rgba(45,45,70,0.6); color:#eae6ff; padding:0.45rem; border-radius:8px; }
+
+.tasks-edit-controls { display:flex; align-items:center; gap:0.5rem; }
+.tasks-edit .task-btn { width:34px; height:34px; }
+.task-total { color:#bdb7d9; margin-left:6px; }
+
+.modal-actions { display:flex; justify-content:flex-end; gap:0.8rem; margin-top:1.1rem; }
+.cancel-btn { background:#232333; color:#cfcde7; padding:0.55rem 1rem; border-radius:8px; border:none; cursor:pointer; }
+.save-btn { background:linear-gradient(90deg,#6d28d9,#4f46e5); color:#fff; padding:0.55rem 1rem; border-radius:8px; border:none; cursor:pointer; }
