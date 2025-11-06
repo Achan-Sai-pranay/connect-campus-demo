@@ -1,6 +1,3 @@
-/* Import Font */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap");
-
 /* ===== MAIN WRAPPER ===== */
 .register-wrapper {
   height: 100vh;
@@ -25,7 +22,7 @@
   height: 350px;
   background: radial-gradient(circle, rgba(255, 255, 255, 0.35), transparent);
   filter: blur(90px);
-  animation: floatBubble 10s infinite alternate ease-in-out; /* slower */
+  animation: floatBubble 10s infinite alternate ease-in-out;
 }
 .register-wrapper::before { top: -50px; left: -80px; }
 .register-wrapper::after { bottom: -50px; right: -80px; }
@@ -55,20 +52,15 @@
   border: 2px solid rgba(255, 255, 255, 0.28);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
-  animation: cardPop 0.9s ease-out, floatUpDown 6s infinite ease-in-out; /* slower */
+
+  /* ❗️ Only pop/appear animation — no floating */
+  animation: cardPop 0.9s ease-out;
 }
 
 /* Card appearing animation */
 @keyframes cardPop {
   from { opacity: 0; transform: translateY(30px) scale(0.9); }
   to { opacity: 1; transform: translateY(0px) scale(1); }
-}
-
-/* Floating animation */
-@keyframes floatUpDown {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
 }
 
 /* ===== LEFT FORM ===== */
@@ -89,7 +81,7 @@
 .input-container {
   position: relative;
   width: 100%;
-  transition: transform 0.4s ease; /* smoother */
+  transition: transform 0.4s ease;
 }
 
 .input-container i {
@@ -141,7 +133,7 @@
   cursor: pointer;
   background: linear-gradient(135deg, #6a3aff, #b85aff, #f76fff);
   background-size: 200% 200%;
-  animation: btnGradient 8s infinite alternate ease-in-out; /* slower */
+  animation: btnGradient 8s infinite alternate ease-in-out;
 }
 
 @keyframes btnGradient {
