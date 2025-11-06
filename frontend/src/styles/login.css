@@ -1,4 +1,4 @@
-/* Full page alignment */
+/* Full page background animation */
 .login-wrapper {
   height: 100vh;
   width: 100%;
@@ -7,50 +7,59 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  animation: fadeIn 0.6s ease-in-out;
+
+  /* ✅ Same background animation as register */
+  background-size: 300% 300%;
+  animation: bgMove 8s infinite alternate ease-in-out;
 }
 
-/* Card */
+/* Floating Animated Card */
 .login-card {
   background: rgba(255, 255, 255, 0.12);
-  -webkit-backdrop-filter: blur(12px);
-  backdrop-filter: blur(12px);
-  border-radius: 20px;
-  padding: 40px 35px;
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  border-radius: 22px;
+  padding: 45px 38px;
   max-width: 380px;
   width: 100%;
   text-align: center;
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  animation: slideUp 0.7s ease-in-out;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+
+  /* ✅ Same animation combo */
+  animation: slideUp 0.7s ease-out, floating 4s infinite ease-in-out;
 }
 
+/* Title */
 .login-card h2 {
-  font-size: 28px;
+  font-size: 30px;
   font-weight: bold;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
 }
 
+/* Subtitle */
 .subtitle {
   font-size: 14px;
-  margin-bottom: 25px;
+  margin-bottom: 22px;
   opacity: 0.8;
 }
 
-/* Input group wrapper */
+/* Input wrapper */
 .input-group {
   position: relative;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 /* Icons inside input */
 .input-icon {
   position: absolute;
-  left: 14px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 18px;
-  color: #d6d6d6;
+  color: #d8d8d8;
+  transition: 0.2s ease;
 }
 
 /* Inputs */
@@ -62,38 +71,42 @@ input {
   outline: none;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
-  font-size: 14px;
-  transition: all 0.3s ease;
+  font-size: 15px;
+  transition: all 0.35s ease;
 }
 
 input:focus {
-  background: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.32);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  transform: scale(1.03);
 }
 
 /* Button */
 .login-btn {
   width: 100%;
-  padding: 12px;
+  padding: 13px;
   margin-top: 10px;
   border: none;
   border-radius: 25px;
-  background: linear-gradient(90deg, #6d40ff, #b678ff);
+  background: linear-gradient(90deg, #7649ff, #b378ff);
   color: white;
-  font-size: 16px;
+  font-size: 17px;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.25s ease;
+  transition: 0.28s ease;
+
+  /* ✅ Same glowing animation as register */
+  animation: pulseBtn 3s infinite;
 }
 
 .login-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0px 4px 20px rgba(150, 90, 255, 0.6);
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0px 4px 20px rgba(160, 90, 255, 0.7);
 }
 
 /* Register link */
 .no-account {
-  margin-top: 16px;
+  margin-top: 18px;
   font-size: 14px;
 }
 
@@ -101,29 +114,32 @@ input:focus {
   color: #ffde59;
   font-weight: bold;
   text-decoration: none;
+  transition: 0.2s ease;
 }
 
 .no-account a:hover {
-  text-decoration: underline;
+  text-shadow: 0 0 8px #ffea8a;
 }
 
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
+/* ✅ Animations (same as register.css) */
 @keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(40px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes floating {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulseBtn {
+  0% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+  50% { box-shadow: 0 0 18px rgba(255,255,255,0.45); }
+  100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+}
+
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
