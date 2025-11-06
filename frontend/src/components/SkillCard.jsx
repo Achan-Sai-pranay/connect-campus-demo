@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import CallModal from "./CallModal";
-import "../styles/SkillCard.css"; // keep your existing CSS if you have one
+import "../styles/SkillCard.css";
 
 const SkillCard = ({
   skill,
@@ -11,54 +11,78 @@ const SkillCard = ({
 }) => {
   const [isCallOpen, setIsCallOpen] = useState(false);
 
-  // Handle call end
+  // Called when CallModal triggers onEndCall (only one peer should award XP)
   const handleEndCall = () => {
-    // XP logic (frontend only)
-    if (skill.acceptedBy === currentUser) {
-      onXpUpdate(currentUser, 100); // helper gets +100 XP
-    } else if (skill.postedBy === currentUser) {
-      onXpUpdate(currentUser, 33); // requester gets +33 XP
+    // Only the helper (acceptedBy) performs XP awarding to avoid duplicates
+    const helper = skill.acceptedBy;
+    const requester = skill.postedBy;
+
+    if (!helper || !requester) {
+      // if data missing still mark complete locally
+      onComplete(skill.id);
+      setIsCallOpen(false);
+      return;
     }
-    onComplete(skill.id); // mark session completed
+
+    if (currentUser === helper) {
+      // helper finishes the session -> award to both
+      if (onXpUpdate) {
+        onXpUpdate(helper, 100);     // helper +100
+        onXpUpdate(requester, 33);   // requester +33
+      }
+    }
+
+    // mark session completed (idempotent)
+    if (onComplete) onComplete(skill.id);
     setIsCallOpen(false);
   };
 
   return (
-    <div className="bg-[#1c1b29] text-white rounded-2xl p-4 shadow-lg hover:shadow-purple-700/30 transition-all w-full md:w-[340px]">
-      <h3 className="text-lg font-semibold text-purple-400">{skill.title}</h3>
-      <p className="text-sm text-gray-300 mt-1">{skill.description}</p>
-
-      <div className="flex justify-between items-center mt-3 text-sm text-gray-400">
-        <span>Posted by: <span className="text-purple-300">{skill.postedBy}</span></span>
-        <span>Status: <span className="text-blue-400">{skill.status}</span></span>
+    <div className="skill-card">
+      <div className="skill-card-header">
+        <h3>{skill.title}</h3>
+        <span
+          className={`skill-type ${
+            skill.status === "completed"
+              ? "completed"
+              : skill.status === "accepted"
+              ? "accepted"
+              : "request"
+          }`}
+        >
+          {skill.status.charAt(0).toUpperCase() + skill.status.slice(1)}
+        </span>
       </div>
 
-      {skill.status === "open" && skill.postedBy !== currentUser && (
-        <button
-          onClick={() => onAccept(skill.id, currentUser)}
-          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 mt-4 rounded-lg w-full transition-all"
-        >
-          Accept Request
-        </button>
-      )}
+      <p className="skill-desc">{skill.description}</p>
 
-      {skill.status === "accepted" &&
-        (skill.acceptedBy === currentUser || skill.postedBy === currentUser) && (
-          <button
-            onClick={() => setIsCallOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 mt-4 rounded-lg w-full transition-all"
-          >
-            Join Session
-          </button>
-        )}
+      <div className="skill-footer">
+        <span className="posted-by">
+          Posted by: <strong>{skill.postedBy === currentUser ? `${skill.postedBy} (You)` : skill.postedBy}</strong>
+        </span>
 
-      {skill.status === "completed" && (
-        <p className="text-green-400 text-center mt-3 font-semibold">
-          ✅ Session Completed
-        </p>
-      )}
+        {skill.status === "completed" ? (
+          <span className="completed-text">✅ Session Completed</span>
+        ) : skill.status === "open" ? (
+          skill.postedBy !== currentUser ? (
+            <button className="accept-btn" onClick={() => onAccept(skill.id, currentUser)}>
+              Accept
+            </button>
+          ) : (
+            <span className="your-post">📬 Waiting for help...</span>
+          )
+        ) : skill.status === "accepted" ? (
+          // show Join Session to both participants (acceptedBy and poster)
+          (skill.acceptedBy === currentUser || skill.postedBy === currentUser) ? (
+            <button className="accept-btn" onClick={() => setIsCallOpen(true)}>
+              Join Session
+            </button>
+          ) : (
+            <span className="accepted-by">✅ Accepted by <strong>{skill.acceptedBy}</strong></span>
+          )
+        ) : null}
+      </div>
 
-      {/* Call Modal */}
       <CallModal
         isOpen={isCallOpen}
         onClose={() => setIsCallOpen(false)}
