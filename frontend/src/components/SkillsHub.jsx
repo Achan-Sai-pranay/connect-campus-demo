@@ -71,8 +71,9 @@ const SkillsHub = () => {
                   key={skill.id}
                   skill={skill}
                   currentUser={currentUser}
-                  onAccept={handleAcceptSkill}
-                  onComplete={handleCompleteSkill}
+                  onAccept={handleAcceptRequest}
+                  onComplete={handleCompleteRequest}
+                  onXpUpdate={handleXpUpdate}
                 />
               ))}
             </div>

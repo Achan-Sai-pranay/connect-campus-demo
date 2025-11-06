@@ -1,56 +1,70 @@
-import React from "react";
-import "../styles/SkillCard.css";
+import React, { useState } from "react";
+import CallModal from "./CallModal";
+import "../styles/SkillCard.css"; // keep your existing CSS if you have one
 
-const SkillCard = ({ skill, currentUser, onAccept, onComplete }) => {
-  const isPostedByUser = skill.postedBy === currentUser;
-  const isAcceptedByUser = skill.acceptedBy === currentUser;
+const SkillCard = ({
+  skill,
+  onAccept,
+  onComplete,
+  currentUser,
+  onXpUpdate,
+}) => {
+  const [isCallOpen, setIsCallOpen] = useState(false);
+
+  // Handle call end
+  const handleEndCall = () => {
+    // XP logic (frontend only)
+    if (skill.acceptedBy === currentUser) {
+      onXpUpdate(currentUser, 100); // helper gets +100 XP
+    } else if (skill.postedBy === currentUser) {
+      onXpUpdate(currentUser, 33); // requester gets +33 XP
+    }
+    onComplete(skill.id); // mark session completed
+    setIsCallOpen(false);
+  };
 
   return (
-    <div className="skill-card">
-      <div className="skill-card-header">
-        <h3>{skill.title}</h3>
-        <span
-          className={`skill-type ${
-            skill.status === "completed"
-              ? "completed"
-              : skill.status === "accepted"
-              ? "accepted"
-              : "request"
-          }`}
+    <div className="bg-[#1c1b29] text-white rounded-2xl p-4 shadow-lg hover:shadow-purple-700/30 transition-all w-full md:w-[340px]">
+      <h3 className="text-lg font-semibold text-purple-400">{skill.title}</h3>
+      <p className="text-sm text-gray-300 mt-1">{skill.description}</p>
+
+      <div className="flex justify-between items-center mt-3 text-sm text-gray-400">
+        <span>Posted by: <span className="text-purple-300">{skill.postedBy}</span></span>
+        <span>Status: <span className="text-blue-400">{skill.status}</span></span>
+      </div>
+
+      {skill.status === "open" && skill.postedBy !== currentUser && (
+        <button
+          onClick={() => onAccept(skill.id, currentUser)}
+          className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 mt-4 rounded-lg w-full transition-all"
         >
-          {skill.status.charAt(0).toUpperCase() + skill.status.slice(1)}
-        </span>
-      </div>
+          Accept Request
+        </button>
+      )}
 
-      <p className="skill-desc">{skill.description}</p>
-
-      <div className="skill-footer">
-        <span className="posted-by">
-          Posted by:{" "}
-          <strong>
-            {isPostedByUser ? `${skill.postedBy} (You)` : skill.postedBy}
-          </strong>
-        </span>
-
-        {/* Button Logic */}
-        {skill.status === "completed" ? (
-          <span className="completed-text">✅ Session Completed</span>
-        ) : isPostedByUser && skill.status === "open" ? (
-          <span className="your-post">📬 Waiting for help...</span>
-        ) : skill.status === "open" ? (
-          <button className="accept-btn" onClick={() => onAccept(skill.id)}>
-            Accept
+      {skill.status === "accepted" &&
+        (skill.acceptedBy === currentUser || skill.postedBy === currentUser) && (
+          <button
+            onClick={() => setIsCallOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 mt-4 rounded-lg w-full transition-all"
+          >
+            Join Session
           </button>
-        ) : isAcceptedByUser && skill.status === "accepted" ? (
-          <button className="complete-btn" onClick={() => onComplete(skill.id)}>
-            Mark Complete
-          </button>
-        ) : (
-          <span className="accepted-by">
-            ✅ Accepted by <strong>{skill.acceptedBy}</strong>
-          </span>
         )}
-      </div>
+
+      {skill.status === "completed" && (
+        <p className="text-green-400 text-center mt-3 font-semibold">
+          ✅ Session Completed
+        </p>
+      )}
+
+      {/* Call Modal */}
+      <CallModal
+        isOpen={isCallOpen}
+        onClose={() => setIsCallOpen(false)}
+        sessionId={skill.id}
+        onEndCall={handleEndCall}
+      />
     </div>
   );
 };
