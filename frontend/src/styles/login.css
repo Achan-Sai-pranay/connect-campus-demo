@@ -8,12 +8,11 @@
   align-items: center;
   padding: 20px;
 
-  /* ✅ Same background animation as register */
   background-size: 300% 300%;
   animation: bgMove 8s infinite alternate ease-in-out;
 }
 
-/* Floating Animated Card */
+/* Fixed Login Card (no floating animation now) */
 .login-card {
   background: rgba(255, 255, 255, 0.12);
   -webkit-backdrop-filter: blur(15px);
@@ -26,8 +25,8 @@
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.28);
 
-  /* ✅ Same animation combo */
-  animation: slideUp 0.7s ease-out, floating 4s infinite ease-in-out;
+  /* Only slide in once, no floating */
+  animation: slideUp 0.7s ease-out;
 }
 
 /* Title */
@@ -59,7 +58,7 @@
   transform: translateY(-50%);
   font-size: 18px;
   color: #d8d8d8;
-  transition: 0.2s ease;
+  transition: 0.25s ease; /* smoother movement */
 }
 
 /* Inputs */
@@ -73,6 +72,13 @@ input {
   color: #fff;
   font-size: 15px;
   transition: all 0.35s ease;
+}
+
+/* Move icon when input is clicked */
+input:focus + .input-icon,
+.input-group:focus-within .input-icon {
+  transform: translateY(-50%) translateX(4px); /* icon moves forward */
+  color: #ffffff;
 }
 
 input:focus {
@@ -95,7 +101,6 @@ input:focus {
   font-weight: bold;
   transition: 0.28s ease;
 
-  /* ✅ Same glowing animation as register */
   animation: pulseBtn 3s infinite;
 }
 
@@ -121,16 +126,10 @@ input:focus {
   text-shadow: 0 0 8px #ffea8a;
 }
 
-/* ✅ Animations (same as register.css) */
+/* Animations */
 @keyframes slideUp {
   from { transform: translateY(40px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes floating {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-8px); }
-  100% { transform: translateY(0px); }
 }
 
 @keyframes pulseBtn {
