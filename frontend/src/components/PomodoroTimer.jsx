@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "../styles/PomodoroTimer.css";
 
 /**
- * Controlled PomodoroTimer with local editing to avoid input flicker.
+ * Controlled PomodoroTimer
  * Props:
  * - durationMinutes, isRunning, sessionStart, timeLeft, topic
  * - onChange(patch) -> partial update to parent
@@ -21,34 +21,31 @@ export default function PomodoroTimer({
   const [localTopic, setLocalTopic] = useState(topic);
   const [, setNow] = useState(Date.now());
   const tickRef = useRef(null);
-  
-  // Ref for the duration value used by the timer logic
+
   const durationRef = useRef(durationMinutes);
   durationRef.current = durationMinutes;
 
   // Sync local state with parent props
   useEffect(() => {
     if (!isRunning || durationMinutes !== localDuration) {
-        setLocalDuration(durationMinutes);
+      setLocalDuration(durationMinutes);
     }
   }, [durationMinutes, isRunning]);
 
-  useEffect(() => {
-    setLocalTopic(topic || "");
-  }, [topic]);
+  useEffect(() => setLocalTopic(topic || ""), [topic]);
 
-  // Tick interval setup
+  // Tick interval
   useEffect(() => {
     if (isRunning) {
-        if (tickRef.current) clearInterval(tickRef.current);
-        tickRef.current = setInterval(() => setNow(Date.now()), 1000);
+      if (tickRef.current) clearInterval(tickRef.current);
+      tickRef.current = setInterval(() => setNow(Date.now()), 1000);
     } else {
-        clearInterval(tickRef.current);
+      clearInterval(tickRef.current);
     }
     return () => clearInterval(tickRef.current);
   }, [isRunning]);
 
-  // --- Timer Calculation Logic ---
+  // Timer calculation
   const totalSeconds = Math.max(1, Math.round(durationRef.current * 60));
   let remaining = timeLeft;
   if (isRunning && sessionStart) {
@@ -58,30 +55,23 @@ export default function PomodoroTimer({
     remaining = typeof timeLeft === "number" ? timeLeft : totalSeconds;
   }
 
-  // Formatting
   const mm = String(Math.floor(remaining / 60)).padStart(2, "0");
   const ss = String(remaining % 60).padStart(2, "0");
-  
-  // Progress calculation
   const progress = Math.min(100, Math.round(((totalSeconds - remaining) / totalSeconds) * 100));
 
   // --- Handlers ---
   const handleStart = () => {
+    if (isRunning) return;
     const now = Date.now();
-    let sessionStartTs;
-    if (isRunning) return; 
-
-    if (remaining < totalSeconds && remaining > 0) {
-        sessionStartTs = now - (totalSeconds - remaining) * 1000;
-    } else {
-        sessionStartTs = now; 
-    }
+    const sessionStartTs = remaining < totalSeconds && remaining > 0
+      ? now - (totalSeconds - remaining) * 1000
+      : now;
 
     onChange({
-      durationMinutes: localDuration, 
+      durationMinutes: localDuration,
       isRunning: true,
       sessionStart: sessionStartTs,
-      timeLeft: remaining > 0 ? remaining : Math.round(localDuration * 60), 
+      timeLeft: remaining > 0 ? remaining : Math.round(localDuration * 60),
       topic: localTopic,
     });
   };
@@ -91,9 +81,13 @@ export default function PomodoroTimer({
   const handleReset = () => onChange({ isRunning: false, sessionStart: null, timeLeft: Math.round(localDuration * 60) });
 
   const handleStopRecord = () => {
-    const recordedMinutes = (totalSeconds - remaining) / 60;
-    // Call onComplete to update parent state and record the session
-    onComplete(recordedMinutes, localTopic); 
+    const elapsedSeconds = totalSeconds - remaining;
+    const elapsedMinutes = +(elapsedSeconds / 60).toFixed(2);
+
+    if (elapsedMinutes <= 0) return;
+
+    onComplete(elapsedMinutes, localTopic);
+    onChange({ isRunning: false, sessionStart: null, timeLeft: totalSeconds });
   };
 
   // Auto-complete detection
@@ -101,19 +95,14 @@ export default function PomodoroTimer({
     if (isRunning && remaining <= 0) {
       onComplete(durationMinutes, localTopic);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [remaining, isRunning, durationMinutes]); 
+  }, [remaining, isRunning, durationMinutes, localTopic, onComplete]);
 
-  // Local duration change logic
+  // Local duration input
   const onLocalDurationChange = (val) => {
-    if (val === "") {
-      setLocalDuration("");
-      return;
-    }
+    if (val === "") { setLocalDuration(""); return; }
     const n = Number(val);
     if (Number.isNaN(n)) return;
-    const clamped = Math.max(1, Math.min(300, Math.floor(n)));
-    setLocalDuration(clamped);
+    setLocalDuration(Math.max(1, Math.min(300, Math.floor(n))));
   };
 
   const onDurationBlur = () => {
@@ -122,9 +111,7 @@ export default function PomodoroTimer({
     onChange({ durationMinutes: final, timeLeft: final * 60, isRunning: false, sessionStart: null });
   };
 
-  const onTopicBlur = () => {
-    onChange({ topic: localTopic });
-  };
+  const onTopicBlur = () => onChange({ topic: localTopic });
 
   return (
     <div className="pomodoro-card">
@@ -167,10 +154,7 @@ export default function PomodoroTimer({
             strokeDashoffset={(1 - progress / 100) * 2 * Math.PI * 110}
           />
         </svg>
-
-        <div className="time-display">
-          {mm}:{ss}
-        </div>
+        <div className="time-display">{mm}:{ss}</div>
       </div>
 
       <div className="controls">
@@ -180,17 +164,11 @@ export default function PomodoroTimer({
           </button>
         ) : (
           <>
-            <button className="btn pause" onClick={handlePause}>
-              Pause
-            </button>
-            <button className="btn stop" onClick={handleStopRecord}>
-              Stop & Record
-            </button>
+            <button className="btn pause" onClick={handlePause}>Pause</button>
+            <button className="btn stop" onClick={handleStopRecord}>Stop & Record</button>
           </>
         )}
-        <button className="btn reset" onClick={handleReset}>
-          Reset
-        </button>
+        <button className="btn reset" onClick={handleReset}>Reset</button>
       </div>
 
       <div className="session-info">
