@@ -16,16 +16,16 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // Parse JSON body
 
+// Health check route (this is required for frontend checker)
+app.get("/api", (req, res) => {
+  res.json({ message: "API is working ✅" });
+});
+
 // Routes
 app.use("/api/auth", authRoutes);         // Authentication routes
 app.use("/api/sessions", sessionRoutes);  // Productivity session routes
 
-// Health check
-app.get("/", (req, res) => {
-  res.send("✅ Backend Running...");
-});
-
-// Error handler middleware (optional but recommended)
+// Error handler middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong!", error: err.message });

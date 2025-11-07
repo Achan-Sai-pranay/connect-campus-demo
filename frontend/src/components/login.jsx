@@ -12,35 +12,37 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
-      alert("✅ Login Successful");
-      localStorage.setItem("token", data.token);
+      if (response.ok) {
+        alert("✅ Login Successful");
+        localStorage.setItem("token", data.token);
 
-      navigate("/"); // redirect after login
-    } else {
-      alert(data.message || "Login failed!");
+        navigate("/dashboard"); // redirect after login
+      } else {
+        alert(data.message || "Login failed!");
+      }
+    } catch (error) {
+      alert("Connection failed. Check backend!");
+      console.error(error);
     }
   };
 
   return (
     <div className="login-wrapper">
-
       {/* Form Card */}
       <div className="login-card">
-
         <h2>Welcome Back</h2>
         <p className="subtitle">Login to continue 🚀</p>
 
         <form onSubmit={handleSubmit}>
-
           {/* Email Input */}
           <div className="input-group">
             <FiMail className="input-icon" />

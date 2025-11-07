@@ -9,29 +9,26 @@ const userSchema = new mongoose.Schema(
     email: { 
       type: String, 
       required: true, 
-      unique: true // Ensure emails are unique
+      unique: true
     },
     password: { 
       type: String 
-    }, // Optional for Google sign-ups
-    
-    // --- Essential for Google Sign-In ---
-    googleId: { 
-      type: String, 
-      unique: true, // This ID must be unique across all Google users
-      sparse: true  // Allows standard users (without googleId) to exist
     },
-    provider: { // Tracks the sign-up method (e.g., 'standard' or 'google')
-      type: String, 
-      enum: ['standard', 'google'], 
-      default: 'standard',
-      required: true
+
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+
+    googleAccount: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
 );
 
-// NEW (prevents OverwriteModelError)
+// Prevent model overwrite error
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 export default User;
-

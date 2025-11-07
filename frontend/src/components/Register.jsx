@@ -28,7 +28,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
@@ -37,7 +37,11 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage({ type: "success", text: "Registration Successful ✅ Redirecting..." });
+        setMessage({
+          type: "success",
+          text: "Registration Successful ✅ Redirecting...",
+        });
+
         localStorage.setItem("token", data.token);
 
         setTimeout(() => navigate("/dashboard"), 1500);
@@ -60,7 +64,7 @@ const Register = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const googleUser = result.user;
 
-      const response = await fetch(`${API_BASE_URL}/api/auth/google-register`, {
+      const response = await fetch(`${API_BASE_URL}/auth/google-register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -81,7 +85,6 @@ const Register = () => {
 
   return (
     <div className="register-wrapper">
-
       <div className="register-card">
 
         {/* LEFT SIDE FORM */}
@@ -143,15 +146,12 @@ const Register = () => {
           </button>
         </form>
 
-        {/* ✅ RIGHT SIDE GOOGLE SIGNUP CARD */}
+        {/* ✅ RIGHT SIDE GOOGLE SIGNUP */}
         <div className="google-container">
-
-          {/* 🚀 Moved Login text here */}
           <p className="already-account">
             Already have an account? <Link to="/login">Login</Link>
           </p>
 
-          {/* Divider */}
           <div className="divider">or</div>
 
           <button className="google-btn" onClick={handleGoogleSignup}>

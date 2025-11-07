@@ -1,8 +1,11 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import { OAuth2Client } from "google-auth-library";
 
-// Helper: Generate JWT token
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Generate JWT Token
 const generateToken = (userId) => {
   return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
@@ -32,17 +35,28 @@ export const registerUser = async (req, res) => {
   }
 };
 
-/** ✅ GOOGLE REGISTER */
+/** ✅ GOOGLE LOGIN / REGISTER */
 export const googleRegister = async (req, res) => {
   try {
-    const { name, email } = req.body;
+    const { token } = req.body;
+
+    // Verify Google token from frontend
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const { sub: googleId, name, email } = payload;
 
     let user = await User.findOne({ email });
 
+    // If new user, create
     if (!user) {
       user = await User.create({
         name,
         email,
+        googleId,
         googleAccount: true,
       });
     }
@@ -52,7 +66,10 @@ export const googleRegister = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (error) {
-    res.status(500).json({ message: "Google signup failed", error: error.message });
+    res.status(500).json({
+      message: "Google sign-in failed",
+      error: error.message,
+    });
   }
 };
 
@@ -61,15 +78,14 @@ export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find User by Email
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "User not found" });
 
-    // If account is Google Signup, do not allow password login
     if (user.googleAccount)
-      return res.status(400).json({ message: "This account is registered with Google. Please use Google login." });
+      return res
+        .status(400)
+        .json({ message: "This account is registered using Google. Please login with Google." });
 
-    // Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid password" });
 
