@@ -1,4 +1,3 @@
-// src/components/AddSkillForm.jsx
 import React, { useState } from "react";
 import "../styles/AddSkillForm.css";
 
@@ -7,7 +6,7 @@ const AddSkillForm = ({ onSave, onCancel }) => {
     type: "Teaching",
     title: "",
     tags: "",
-    xp: "",
+    xp: 50,
   });
 
   const handleChange = (e) => {
@@ -16,12 +15,16 @@ const AddSkillForm = ({ onSave, onCancel }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.title || !formData.tags || !formData.xp) return;
-    const newSkill = {
-      ...formData,
-      tags: formData.tags.split(",").map((t) => t.trim()),
+    if (!formData.title.trim()) return;
+    const payload = {
+      _id: `local-${Date.now()}`,
+      type: formData.type,
+      title: formData.title.trim(),
+      xp: Number(formData.xp) || 50,
+      tags: formData.tags ? formData.tags.split(",").map((t) => t.trim()) : [],
+      postedBy: "You",
     };
-    onSave(newSkill);
+    onSave(payload);
   };
 
   return (
@@ -36,35 +39,17 @@ const AddSkillForm = ({ onSave, onCancel }) => {
           </select>
 
           <label>Title:</label>
-          <input
-            name="title"
-            placeholder="e.g., React Advanced Patterns"
-            value={formData.title}
-            onChange={handleChange}
-          />
+          <input name="title" placeholder="e.g., React Patterns" value={formData.title} onChange={handleChange} />
 
           <label>Tags (comma separated):</label>
-          <input
-            name="tags"
-            placeholder="React, Frontend"
-            value={formData.tags}
-            onChange={handleChange}
-          />
+          <input name="tags" placeholder="React, Frontend" value={formData.tags} onChange={handleChange} />
 
           <label>XP:</label>
-          <input
-            name="xp"
-            type="number"
-            placeholder="50"
-            value={formData.xp}
-            onChange={handleChange}
-          />
+          <input name="xp" type="number" placeholder="50" value={formData.xp} onChange={handleChange} />
 
           <div className="form-buttons">
             <button type="submit" className="save-btn">Save</button>
-            <button type="button" className="cancel-btn" onClick={onCancel}>
-              Cancel
-            </button>
+            <button type="button" className="cancel-btn" onClick={onCancel}>Cancel</button>
           </div>
         </form>
       </div>

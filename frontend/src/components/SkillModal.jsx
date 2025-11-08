@@ -1,4 +1,3 @@
-// src/components/SkillModal.jsx
 import React, { useState } from "react";
 import "../styles/SkillModal.css";
 
@@ -8,20 +7,17 @@ const SkillModal = ({ onAddSkill, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
     if (!title.trim() || !description.trim()) return;
-
     const newSkill = {
-      id: Date.now(),
-      type: "request",
-      title,
-      description,
+      // use _id so components expecting backend-like object don't break
+      _id: `local-${Date.now()}`,
+      title: title.trim(),
+      description: description.trim(),
       xp: 50,
       postedBy: "You",
       status: "open",
       acceptedBy: null,
     };
-
     onAddSkill(newSkill);
     onClose();
   };
@@ -34,18 +30,18 @@ const SkillModal = ({ onAddSkill, onClose }) => {
           <label>Title</label>
           <input
             type="text"
-            placeholder="e.g., Need help with Normal Forms"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            placeholder="e.g., Need help with Normal Forms"
           />
 
           <label>Description</label>
           <textarea
             rows="4"
-            placeholder="Describe what exactly you need help with."
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-          ></textarea>
+            placeholder="Describe what exactly you need help with."
+          />
 
           <div className="modal-actions">
             <button type="submit" className="submit-btn">

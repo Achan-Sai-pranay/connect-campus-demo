@@ -1,32 +1,12 @@
-/* src/styles/Topbar.css */
+/* --- Topbar.css --- */
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  background-color: #0f111a;
-  border: 1px solid #181a25;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px; background-color: #0f111a; border: 1px solid #181a25;
   border-radius: 10px;
 }
-
-.topbar h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.topbar p {
-  margin: 0;
-  color: #8e8ea1;
-  font-size: 13px;
-}
-
+.topbar h2 { margin: 0; font-size: 20px; font-weight: 600; }
+.topbar p { margin: 0; color: #8e8ea1; font-size: 13px; }
 .add-btn {
-  background: linear-gradient(90deg, #6f3cff, #3db0ff);
-  border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
+  background: linear-gradient(90deg, #6f3cff, #3db0ff); border: none;
+  padding: 10px 18px; border-radius: 6px; color: white; font-weight: 500; cursor: pointer;
 }

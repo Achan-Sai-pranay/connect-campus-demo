@@ -1,47 +1,17 @@
-/* src/styles/XPHeader.css */
+/* --- XPHeader.css --- */
 .xp-header {
-  background-color: #0f111a;
-  border: 1px solid #181a25;
-  border-radius: 12px;
-  padding: 16px 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 20px;
+  display:flex; align-items:center; justify-content:space-between;
+  background: linear-gradient(180deg,#0f0f19,#0b0b12); padding:12px 16px;
+  border-radius:10px; border:1px solid rgba(60,50,120,0.06);
 }
-
-.xp-left {
-  flex: 1;
+.level-info { display:flex; flex-direction:column; gap:4px; }
+.level-title { font-weight:700; color:#e8e2ff; }
+.xp-count { color:#bdbde6; font-size:0.95rem; }
+.xp-bar-container { flex-basis: 60%; margin-left: 12px; }
+.xp-bar { width:100%; height:10px; background:#0b0b14; border-radius:10px; 
+    overflow:hidden; border:1px solid rgba(60,50,120,0.04); 
 }
-
-.xp-title {
-  margin: 0;
-  font-size: 14px;
-  color: #9a9aa5;
-}
-
-.xp-bar {
-  background-color: #1a1a25;
-  border-radius: 10px;
-  height: 8px;
-  width: 100%;
-  margin: 6px 0;
-}
-
-.xp-progress {
-  background: linear-gradient(90deg, #6c5ce7, #3d9cff);
-  height: 100%;
-  border-radius: 10px;
-}
-
-.xp-count {
-  font-size: 12px;
-  color: #9a9aa5;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid #3d9cff;
+.xp-progress { 
+    height:100%; background: linear-gradient(90deg,#6c63ff,#3db0ff); width:0%; 
+    transition: width .4s ease; 
 }

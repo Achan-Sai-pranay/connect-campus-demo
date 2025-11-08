@@ -1,0 +1,12 @@
+.session-overlay {
+  position: fixed; inset: 0; display:flex; align-items:center; justify-content:center;
+  background: rgba(6,7,12,0.6); z-index: 1500;
+}
+.session-card {
+  width: 320px; background: linear-gradient(180deg,#0f0f19,#0b0b12); border-radius:12px; padding:18px;
+  border:1px solid rgba(80,60,140,0.06); box-shadow: 0 10px 30px rgba(60,40,120,0.08); text-align:center;
+}
+.session-card h3 { margin: 0 0 8px 0; color:#e8e2ff; }
+.session-text { color:#d0d0e8; margin-bottom:14px; }
+.session-actions { display:flex; justify-content:center; }
+.session-btn { background: linear-gradient(90deg,#6c63ff,#3db0ff); border:none; padding:8px 14px; border-radius:10px; color:white; cursor:pointer; }

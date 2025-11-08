@@ -1,100 +1,48 @@
 .skill-card {
-  background: #0f0f19;
-  border: 1px solid #2a2a3b;
-  border-radius: 12px;
-  padding: 1rem;
-  color: white;
-  box-shadow: 0 0 10px rgba(80, 60, 200, 0.2);
-  transition: all 0.3s ease;
+  background: linear-gradient(180deg, #0f0f19, #0e0e16);
+  border-radius: 10px;
+  padding: 14px;
+  border: 1px solid rgba(60, 50, 90, 0.12);
+  box-shadow: 0 6px 18px rgba(50, 40, 100, 0.08);
+  /* Removed hover transform to prevent jitter */
 }
 
-.skill-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 15px rgba(130, 90, 255, 0.3);
-}
-
-.skill-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.skill-type {
-  padding: 0.3rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  text-transform: capitalize;
-}
-
-.skill-type.offer {
-  background: linear-gradient(90deg, #6c63ff, #836fff);
-}
-
-.skill-type.request {
-  background: linear-gradient(90deg, #4a9fff, #7b61ff);
+.skill-card h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #e8e2ff;
 }
 
 .skill-desc {
-  margin: 0.5rem 0 1rem;
-  color: #ccc;
+  margin: 8px 0;
+  color: #cfcfe5;
+  font-size: 0.95rem;
 }
 
-.skill-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.skill-meta {
+  color: #b8b8c8;
+  font-size: 0.9rem;
+  margin: 8px 0 12px 0;
 }
 
 .accept-btn {
-  background: linear-gradient(90deg, #6c63ff, #836fff);
+  background: linear-gradient(90deg,#6c63ff,#3db0ff);
   border: none;
   color: white;
-  padding: 6px 12px;
+  padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.3s;
+  font-weight: 600;
+  transition: opacity 0.2s;
 }
 
 .accept-btn:hover {
-  opacity: 0.85;
-}
-
-.accepted-by {
-  color: #8ef39c;
-}
-
-.posted-by {
-  color: #aaa;
-  font-size: 0.9rem;
-}
-
-.complete-btn {
-  background: linear-gradient(90deg, #3ee77e, #58ffb1);
-  border: none;
-  color: black;
-  padding: 6px 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: 0.3s;
-  font-weight: 600;
-}
-
-.complete-btn:hover {
-  opacity: 0.85;
+  opacity: 0.95; /* subtle hover effect, no movement */
 }
 
 .your-post {
-  color: #aaa;
+  color: #9a9aa5;
   font-style: italic;
-}
-
-.skill-type.accepted {
-  background: linear-gradient(90deg, #4c6ef5, #6a9eff);
-}
-.skill-type.completed {
-  background: linear-gradient(90deg, #32d17b, #6affb5);
-}
-.completed-text {
-  color: #9effa2;
-  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0;
 }
