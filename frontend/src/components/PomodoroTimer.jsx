@@ -48,6 +48,7 @@ export default function PomodoroTimer({
   // Timer calculation
   const totalSeconds = Math.max(1, Math.round(durationRef.current * 60));
   let remaining = timeLeft;
+
   if (isRunning && sessionStart) {
     const elapsed = Math.floor((Date.now() - sessionStart) / 1000);
     remaining = Math.max(0, totalSeconds - elapsed);
@@ -83,19 +84,19 @@ export default function PomodoroTimer({
   const handleStopRecord = () => {
     const elapsedSeconds = totalSeconds - remaining;
     const elapsedMinutes = +(elapsedSeconds / 60).toFixed(2);
-
     if (elapsedMinutes <= 0) return;
 
     onComplete(elapsedMinutes, localTopic);
     onChange({ isRunning: false, sessionStart: null, timeLeft: totalSeconds });
   };
 
-  // Auto-complete detection
+  // Auto-complete detection (fires only once when session ends)
   useEffect(() => {
     if (isRunning && remaining <= 0) {
       onComplete(durationMinutes, localTopic);
+      onChange({ isRunning: false, sessionStart: null, timeLeft: totalSeconds });
     }
-  }, [remaining, isRunning, durationMinutes, localTopic, onComplete]);
+  }, [remaining]);
 
   // Local duration input
   const onLocalDurationChange = (val) => {

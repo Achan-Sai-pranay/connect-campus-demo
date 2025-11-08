@@ -16,10 +16,8 @@ export default function Productivity() {
     completedSessions: 0,
   });
 
-  // helper to partially update state
   const updateState = (patch) => setState((s) => ({ ...s, ...patch }));
 
-  // Fetch all sessions on mount
   useEffect(() => {
     const fetchSessions = async () => {
       try {
@@ -38,7 +36,6 @@ export default function Productivity() {
     fetchSessions();
   }, []);
 
-  // Called when PomodoroTimer completes
   const handleSessionComplete = async (minutesRecorded, topicText) => {
     let duration = Number(minutesRecorded);
     if (duration <= 0) duration = 0.01;
@@ -68,7 +65,6 @@ export default function Productivity() {
     }
   };
 
-  // Reset all sessions
   const handleResetAll = async () => {
     if (!window.confirm("Are you sure you want to reset all progress?")) return;
 
@@ -107,7 +103,7 @@ export default function Productivity() {
             timeLeft={state.timeLeft}
             topic={state.topic}
             onChange={(patch) => updateState(patch)}
-            onComplete={(mins, t) => handleSessionComplete(mins, t)}
+            onComplete={handleSessionComplete}
           />
 
           <div className="prod-local-controls" style={{ display: "flex", gap: "10px", marginTop: "16px", alignItems: "center", flexWrap: "wrap" }}>

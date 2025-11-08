@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell
 } from "recharts";
 import "../styles/ProductivityAnalytics.css";
 
@@ -25,38 +18,23 @@ export default function ProductivityAnalytics({ sessions = [] }) {
     let fpSum = 0;
 
     sessions.forEach((s) => {
-      const id = Number(s.id) || Date.now();
-      const date = new Date(id);
-      
-      if (isNaN(date.getTime())) return; 
+      const date = new Date(s.createdAt); // ✅ use createdAt instead of id
+      if (isNaN(date.getTime())) return;
 
       const dateKey = date.toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
-      
-      const mins = Number(s.duration) || 0; 
+      const mins = Number(s.duration) || 0;
       const t = s.topic || "Unknown";
-      
+
       dayMap[dateKey] = (dayMap[dateKey] || 0) + mins;
       topicMap[t] = (topicMap[t] || 0) + mins;
       fpSum += Number(s.fp) || 0;
     });
 
     const dayArr = Object.keys(dayMap)
-      .sort((a, b) => {
-        const da = new Date(a);
-        const db = new Date(b);
-        return da.getTime() - db.getTime();
-      })
-      .map((d) => ({ 
-        date: d, 
-        // FIX 1: Ensure minimum value is 1 for charts (Math.ceil rounds up)
-        minutes: Math.max(1, Math.ceil(dayMap[d])) 
-      }));
+      .sort((a, b) => new Date(a) - new Date(b))
+      .map(d => ({ date: d, minutes: Math.max(1, Math.ceil(dayMap[d])) }));
 
-    const topicArr = Object.keys(topicMap).map((t) => ({ 
-        name: t, 
-        // FIX 2: Ensure minimum value is 1 for charts
-        value: Math.max(1, Math.ceil(topicMap[t]))
-    })); 
+    const topicArr = Object.keys(topicMap).map(t => ({ name: t, value: Math.max(1, Math.ceil(topicMap[t])) }));
 
     setDailyData(dayArr);
     setTopicData(topicArr);
@@ -72,9 +50,7 @@ export default function ProductivityAnalytics({ sessions = [] }) {
     );
   }
 
-  // Calculate Y-axis domain to ensure 0 is shown (unless all values are 0, which we fixed)
   const maxMinutes = dailyData.length > 0 ? Math.max(...dailyData.map(d => d.minutes)) : 0;
-  // Ensure Y-axis goes up to at least 6 (or the max if higher)
   const yDomainMax = Math.max(6, maxMinutes);
 
   return (
@@ -87,49 +63,39 @@ export default function ProductivityAnalytics({ sessions = [] }) {
         </div>
       </div>
 
-      {/* Bar Chart (Daily Data) */}
+      {/* Bar Chart */}
       <div className="analytics-chart-section">
-          <h4 className="chart-title">Daily Focus Minutes</h4>
-          <ResponsiveContainer width="100%" height={150}>
-            <BarChart 
-                data={dailyData} 
-                margin={{ top: 5, right: 5, left: -20, bottom: 5 }} // FIX 3: Adjust margin for narrow space
-            >
-              <XAxis dataKey="date" stroke="#bfc6ff" style={{ fontSize: '10px' }} />
-              <YAxis 
-                stroke="#bfc6ff" 
-                style={{ fontSize: '10px' }} 
-                domain={[0, yDomainMax]} // FIX 4: Set Y-Axis domain explicitly to show 0
-                tickCount={4}
-              />
-              <Tooltip formatter={(value) => [`${value} min`, 'Minutes']} />
-              <Bar dataKey="minutes" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+        <h4 className="chart-title">Daily Focus Minutes</h4>
+        <ResponsiveContainer width="100%" height={150}>
+          <BarChart data={dailyData} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+            <XAxis dataKey="date" stroke="#bfc6ff" style={{ fontSize: '10px' }} />
+            <YAxis stroke="#bfc6ff" style={{ fontSize: '10px' }} domain={[0, yDomainMax]} tickCount={4} />
+            <Tooltip formatter={(value) => [`${value} min`, 'Minutes']} />
+            <Bar dataKey="minutes" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
-      {/* Pie Chart (Topic Data) */}
+      {/* Pie Chart */}
       <div className="analytics-chart-section" style={{ marginTop: '16px' }}>
-          <h4 className="chart-title">Top Topics</h4>
-          <ResponsiveContainer width="100%" height={150}>
-            <PieChart>
-              <Pie 
-                data={topicData.sort((a,b)=>b.value-a.value).slice(0, 5)} 
-                dataKey="value" 
-                nameKey="name" 
-                cx="50%" 
-                cy="50%" 
-                outerRadius={60}
-                labelLine={false}
-                // FIX 5: Use payload value directly for labels to ensure readability
-                label={({ name, percent }) => `${name.substring(0, 10)} (${(percent * 100).toFixed(0)}%)`}
-                style={{ fontSize: '9px' }}
-              >
-                {topicData.slice(0, 5).map((entry, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-              </Pie>
-              <Tooltip formatter={(value) => [`${value} min`, 'Minutes']}/>
-            </PieChart>
-          </ResponsiveContainer>
+        <h4 className="chart-title">Top Topics</h4>
+        <ResponsiveContainer width="100%" height={150}>
+          <PieChart>
+            <Pie
+              data={topicData.sort((a, b) => b.value - a.value).slice(0, 5)}
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={60}
+              label={({ name, percent }) => `${name.substring(0, 10)} (${(percent * 100).toFixed(0)}%)`}
+              labelLine={false}
+            >
+              {topicData.slice(0, 5).map((entry, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
+            </Pie>
+            <Tooltip formatter={(value) => [`${value} min`, 'Minutes']} />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
     </div>
   );
