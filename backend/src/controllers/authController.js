@@ -40,7 +40,6 @@ export const googleRegister = async (req, res) => {
   try {
     const { token } = req.body;
 
-    // Verify Google token from frontend
     const ticket = await client.verifyIdToken({
       idToken: token,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -73,21 +72,26 @@ export const googleRegister = async (req, res) => {
   }
 };
 
-/** ✅ LOGIN USER */
+/** ✅ LOGIN USER (FIXED PASSWORD SELECT ISSUE) */
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "User not found" });
+    // ✅ Must select +password (your schema hides it by default)
+    const user = await User.findOne({ email }).select("+password");
+
+    if (!user)
+      return res.status(400).json({ message: "User not found" });
 
     if (user.googleAccount)
-      return res
-        .status(400)
-        .json({ message: "This account is registered using Google. Please login with Google." });
+      return res.status(400).json({
+        message: "This account is registered using Google. Please login with Google.",
+      });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid password" });
+
+    if (!isMatch)
+      return res.status(400).json({ message: "Invalid password" });
 
     res.status(200).json({
       message: "Login Successful",

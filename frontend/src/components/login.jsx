@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiMail, FiLock } from "react-icons/fi"; // Icons
+import { FiMail, FiLock } from "react-icons/fi";
 import API_BASE_URL from "../utils/api";
 import "../styles/login.css";
 
@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -31,19 +31,17 @@ const Login = () => {
       }
     } catch (error) {
       alert("Connection failed. Check backend!");
-      console.error(error);
+      console.error("Login error:", error);
     }
   };
 
   return (
     <div className="login-wrapper">
-      {/* Form Card */}
       <div className="login-card">
         <h2>Welcome Back</h2>
         <p className="subtitle">Login to continue 🚀</p>
 
         <form onSubmit={handleSubmit}>
-          {/* Email Input */}
           <div className="input-group">
             <FiMail className="input-icon" />
             <input
@@ -54,7 +52,6 @@ const Login = () => {
             />
           </div>
 
-          {/* Password Input */}
           <div className="input-group">
             <FiLock className="input-icon" />
             <input
@@ -65,15 +62,13 @@ const Login = () => {
             />
           </div>
 
-          {/* Button */}
           <button type="submit" className="login-btn">
             Login
           </button>
         </form>
 
-        {/* Register Redirect */}
         <p className="no-account">
-          Don't have an account? <Link to="/register">Register</Link>
+          Don’t have an account? <Link to="/register">Register</Link>
         </p>
       </div>
     </div>
