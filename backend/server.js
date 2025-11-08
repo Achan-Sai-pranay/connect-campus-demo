@@ -2,36 +2,45 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+
+// Routes
 import authRoutes from "./src/routes/authRoutes.js";
-import sessionRoutes from "./src/routes/sessionRoutes.js"; // Productivity sessions
+import sessionRoutes from "./src/routes/sessionRoutes.js";   // Prod sessions (existing)
+import skillRoutes from "./src/routes/skillRoutes.js";       // ✅ SkillHub routes
+import userRoutes from "./src/routes/userRoutes.js";         // ✅ Leaderboard / XP routes
 
 dotenv.config();
 
-// Connect to MongoDB
+// ✅ Connect to MongoDB
 connectDB();
 
 const app = express();
 
-// Middlewares
+// ✅ Middlewares
 app.use(cors());
 app.use(express.json()); // Parse JSON body
 
-// Health check route (this is required for frontend checker)
+// ✅ Health check (required for frontend testing)
 app.get("/api", (req, res) => {
   res.json({ message: "API is working ✅" });
 });
 
-// Routes
-app.use("/api/auth", authRoutes);         // Authentication routes
-app.use("/api/sessions", sessionRoutes);  // Productivity session routes
+// ✅ Register Routes
+app.use("/api/auth", authRoutes);        // Login / Register / Google Auth
+app.use("/api/sessions", sessionRoutes); // Productivity sessions
+app.use("/api/skills", skillRoutes);     // SkillHub features (requests)
+app.use("/api/users", userRoutes);       // XP & leaderboard updates
 
-// Error handler middleware
+// ✅ Global Error Middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Something went wrong!", error: err.message });
+  console.error("🔥 Server Error:", err.stack);
+  res.status(500).json({
+    message: "Internal server error",
+    error: err.message,
+  });
 });
 
-// Start Server
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () =>
   console.log(`🚀 Server running on port ${PORT}`)

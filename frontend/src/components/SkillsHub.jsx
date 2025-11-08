@@ -3,6 +3,7 @@ import XPHeader from "./XPHeader";
 import SkillCard from "./SkillCard";
 import SkillModal from "./SkillModal";
 import Leaderboard from "./Leaderboard";
+import API_BASE_URL from "../utils/api";    // ✅ Make sure this import exists
 import "../styles/SkillsHub.css";
 
 const SkillsHub = () => {
@@ -12,9 +13,8 @@ const SkillsHub = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
 
-  // Load initial data from localStorage
+  // ✅ Load data once
   useEffect(() => {
-    const savedSkills = JSON.parse(localStorage.getItem("skillsHub_skills")) || [];
     const savedUsers = JSON.parse(localStorage.getItem("skillsHub_users")) || [
       { rank: 1, name: "Alex Chen", level: 12, xp: 2850 },
       { rank: 2, name: "Sarah Kumar", level: 11, xp: 2640 },
@@ -22,68 +22,54 @@ const SkillsHub = () => {
       { rank: 4, name: "Emma Davis", level: 10, xp: 2180 },
       { rank: 5, name: currentUser, level: 9, xp: 1850 },
     ];
-    setSkills(savedSkills);
     setUsers(savedUsers);
+
+    fetch(`${API_BASE_URL}/api/skills`)
+      .then((res) => res.json())
+      .then((data) => setSkills(data))
+      .catch((err) => console.error("Error fetching skills", err));
   }, []);
 
-  // Save whenever data changes
-  useEffect(() => {
-    localStorage.setItem("skillsHub_skills", JSON.stringify(skills));
-  }, [skills]);
+  // ✅ Backend → Create skill
+  const handleAddSkill = async (skill) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/skills`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: skill.title,
+          description: skill.description,
+          postedBy: currentUser,
+        }),
+      });
 
-  useEffect(() => {
-    localStorage.setItem("skillsHub_users", JSON.stringify(users));
-  }, [users]);
-
-  // 🔁 Sync between multiple tabs
-  useEffect(() => {
-    const syncHandler = (e) => {
-      if (e.key === "skillsHub_skills") {
-        setSkills(JSON.parse(e.newValue || "[]"));
-      }
-      if (e.key === "skillsHub_users") {
-        setUsers(JSON.parse(e.newValue || "[]"));
-      }
-    };
-    window.addEventListener("storage", syncHandler);
-    return () => window.removeEventListener("storage", syncHandler);
-  }, []);
-
-  // ➕ Add a new help request
-  const handleAddSkill = (skill) => {
-    const newSkill = {
-      ...skill,
-      id: Date.now(),
-      postedBy: currentUser,
-      status: "open",
-      acceptedBy: null,
-    };
-    const updated = [newSkill, ...skills];
-    setSkills(updated);
-    localStorage.setItem("skillsHub_skills", JSON.stringify(updated));
+      const created = await res.json();
+      setSkills((prev) => [created, ...prev]);
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error("Error adding skill:", err);
+    }
   };
 
-  // ✅ Accept a request
-  const handleAcceptRequest = (id, accepter) => {
+  // Accept request
+  const handleAcceptRequest = async (id, accepter) => {
     const updated = skills.map((s) =>
-      s.id === id && s.status === "open"
+      s._id === id && s.status === "open"
         ? { ...s, status: "accepted", acceptedBy: accepter }
         : s
     );
     setSkills(updated);
-    localStorage.setItem("skillsHub_skills", JSON.stringify(updated));
   };
 
-  // 🏁 Mark completed (call end)
-  const handleCompleteRequest = (id) => {
+  // Complete request
+  const handleCompleteRequest = async (id) => {
     const updated = skills.map((s) =>
-      s.id === id ? { ...s, status: "completed" } : s
+      s._id === id ? { ...s, status: "completed" } : s
     );
     setSkills(updated);
-    localStorage.setItem("skillsHub_skills", JSON.stringify(updated));
   };
 
-  // ⚡ Update XP (and level)
+  // XP update (still local until backend ready)
   const handleXpUpdate = (userName, xpGain) => {
     const updated = users.map((u) =>
       u.name === userName
@@ -98,7 +84,6 @@ const SkillsHub = () => {
     localStorage.setItem("skillsHub_users", JSON.stringify(updated));
   };
 
-  // 🧠 User info
   const currentUserData = users.find((u) => u.name === currentUser);
   const userXP = currentUserData ? currentUserData.xp : 0;
   const userLevel = currentUserData ? currentUserData.level : 1;
@@ -111,28 +96,19 @@ const SkillsHub = () => {
         {/* LEFT FEED */}
         <div className="skills-section">
           <div className="skills-header">
-            <div>
-              <h2>All Help Requests</h2>
-              <p>See who’s asking for what & collaborate</p>
-            </div>
-
-            <button
-              className="request-btn"
-              onClick={() => setIsModalOpen(true)}
-            >
+            <h2>All Help Requests</h2>
+            <button className="request-btn" onClick={() => setIsModalOpen(true)}>
               + Request Help
             </button>
           </div>
 
           {skills.length === 0 ? (
-            <p className="empty-state">
-              No requests yet. Click “Request Help” to start!
-            </p>
+            <p className="empty-state">No requests yet. Click “Request Help”.</p>
           ) : (
             <div className="skills-list">
               {skills.map((skill) => (
                 <SkillCard
-                  key={skill.id}
+                  key={skill._id}
                   skill={skill}
                   currentUser={currentUser}
                   onAccept={handleAcceptRequest}
