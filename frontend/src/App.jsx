@@ -7,7 +7,7 @@ import Productivity from "./components/Productivity";
 import Projects from "./components/Projects";
 import Login from "./components/login.jsx";
 import Register from "./components/Register.jsx";
-
+import Dashboard from "./components/Dashboard.jsx";
 import "./App.css";
 
 const AppContent = () => {
@@ -26,6 +26,7 @@ const AppContent = () => {
         <Route path="/skills" element={<SkillsHub />} />
         <Route path="/productivity" element={<Productivity />} />
         <Route path="/projects" element={<Projects />} />
+        <Route path="/dashboard" element={<Dashboard />} />
 
         {/* ✅ Auth Routes */}
         <Route path="/login" element={<Login />} />
