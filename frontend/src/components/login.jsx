@@ -9,31 +9,31 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await response.json();
+    const data = await response.json();
 
-      if (response.ok) {
-        alert("✅ Login Successful");
-        localStorage.setItem("token", data.token);
-
-        navigate("/dashboard"); // redirect after login
-      } else {
-        alert(data.message || "Login failed!");
-      }
-    } catch (error) {
-      alert("Connection failed. Check backend!");
-      console.error("Login error:", error);
+    if (response.ok) {
+      alert("✅ Login Successful");
+      localStorage.setItem("token", data.token);
+      navigate("/dashboard");
+    } else {
+      alert(data.message || "Login failed!");
     }
-  };
+  } catch (error) {
+    alert("Connection failed. Check backend!");
+    console.error("Login error:", error);
+  }
+};
+
 
   return (
     <div className="login-wrapper">
